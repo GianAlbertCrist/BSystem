@@ -1,220 +1,191 @@
 package Accounts;
+
 import Bank.Bank;
 
-public class SavingsAccount extends Account implements Withdrawal, Deposit, FundTransfer
-{
-    // Balance of this bank account.
-    private double balance;
+/**
+ * SavingsAccount class representing a standard savings account with balance tracking.
+ * It allows deposits, withdrawals, and fund transfers while enforcing banking rules.
+ */
+public class SavingsAccount extends Account implements Withdrawal, Deposit, FundTransfer {
 
-    //Constructor Method.
-    public SavingsAccount(Bank bank, String accountNumber, String ownerFName, String ownerLName, 
-                          String ownerEmail, String pin, double initialBalance) {
-        super(bank, accountNumber, ownerFName, ownerLName, ownerEmail, pin);
-        this.balance = initialBalance;
-    }
-
-    public double getAccountBalance() {
-        return balance;
-    }
+    private double balance;  // The current balance of the savings account
 
     /**
-     * Withdraws an amount of money using a given medium.
-     * @param amount Amount of money to be withdrawn from.
-     */
-    @Override
-    public boolean withdrawal(double amount) {
-        if (amount <= 0) {
-            System.out.println("Withdrawal amount must be greater than 0.");
-            return false;
-        }
-        if (amount > getBank().getWithdrawLimit()) {
-            System.out.println("Withdrawal amount exceeds the bank's limit: ₱" + getBank().getWithdrawLimit());
-            return false;
-        }
-        if (!hasEnoughBalance(amount)) {
-            insufficientBalance();
-            return false;
-        }
-        adjustAccountBalance(-amount);
-        addNewTransaction(getAccountNumber(), Transaction.Transactions.Withdraw, 
-                          "Cash withdrawal: ₱" + amount);
-        return true;
-    }
-
-    /**
-     * Deposit an amount of money to some given account.
-     * @param amount Amount to be deposited.
-     * @return Flag if transaction is successful or not.
-     */
-    @Override
-    public boolean cashDeposit(double amount) {
-        if (amount <= 0) {
-            System.out.println("Deposit amount must be greater than ₱0.");
-            return false;
-        }
-
-        if (amount > getBank().getCreditLimit()) {
-            System.out.println("Deposit amount exceeds the bank's deposit limit of ₱" + getBank().getCreditLimit());
-            return false;
-        }
-
-        adjustAccountBalance(amount);
-        addNewTransaction(getAccountNumber(), Transaction.Transactions.Deposit,
-                "Cash deposit: ₱" + amount);
-
-        return true;
-    }
-
-    /**
-     * Transfer money from one account on the same bank, using the
-     * recepient's account number.
-     * <br><br>
-     * Cannot proceed if one of the following is true:
-     * <ul>
-     *     <li>Insufficient balance from source account.</li>
-     *     <li>Recepient account does not exist.</li>
-     *     <li>Recepient account is from another bank.</li>
-     * </ul>
-     * @param account Accounts.Account number of the recepient.
-     * @param amount Amount of money to be transferred.
-     * @throws IllegalAccountType This error is thrown depending on the rules set upon. Generally occurs
-     * when fund transferring from an incompatible account type.
-     */
-    @Override
-    public boolean transfer(Account account, double amount) throws IllegalAccountType {
-        if (account instanceof CreditAccount) {
-            throw new IllegalAccountType("Cannot transfer funds to a Credit Account.");
-        }
-        if (amount <= 0) {
-            System.out.println("Transfer amount must be greater than 0.");
-            return false;
-        }
-        if (amount > getBank().getWithdrawLimit()) {
-            System.out.println("Transfer amount exceeds the bank's limit: ₱" + getBank().getWithdrawLimit());
-            return false;
-        }
-
-        double totalDeduction = amount + getBank().getProcessingFee();
-
-        if (!hasEnoughBalance(totalDeduction)) {
-            insufficientBalance();
-            return false;
-        }
-
-        if (account instanceof SavingsAccount) {
-            SavingsAccount recipient = (SavingsAccount) account;
-
-            adjustAccountBalance(-totalDeduction);
-            recipient.adjustAccountBalance(amount);
-
-            addNewTransaction(getAccountNumber(), Transaction.Transactions.FundTransfer,
-                    String.format("Transfer to %s: ₱%.2f", account.getAccountNumber(), amount));
-            account.addNewTransaction(getAccountNumber(), Transaction.Transactions.Deposit,
-                    String.format("Transfer from %s: ₱%.2f", getAccountNumber(), amount));
-
-                    return true;
-                }
-                return false;
-    }
-
-    /**
-     * Transfers an amount of money from this account to another savings account.
-     * Should be used when transferring to other banks.
+     * Constructor for SavingsAccount.
      *
-     * @param bank Bank object of the recipient
-     * @param account Account number of recipient
-     * @param amount Amount of money to be supposedly adjusted from this account's balance
-     * @return Flag if fund transfer transaction is successful or not
-     * @throws IllegalAccountType Cannot fund transfer when the other account is of type CreditAccount
+     * @param bank        The bank associated with this savings account.
+     * @param accountNumber The unique account number.
+     * @param ownerFname Owner's first name.
+     * @param ownerLname Owner's last name.
+     * @param ownerEmail       Owner's email address.
+     * @param pin         Security PIN for authentication.
+     * @param balance The initial deposit amount.
+     * @throws IllegalArgumentException If the initial deposit is below 0.
      */
-    @Override
-    public boolean transfer(Bank bank, Account account, double amount) throws IllegalAccountType {
-        if (account instanceof CreditAccount) {
-            throw new IllegalAccountType("Cannot transfer funds to a Credit Account");
+    public SavingsAccount(Bank bank, String accountNumber, String pin, String ownerFname,
+                          String ownerLname, String ownerEmail, double balance) {
+        super(bank, accountNumber, pin, ownerFname, ownerLname, ownerEmail);
+        if (balance < 0) {
+            throw new IllegalArgumentException("Initial deposit cannot be negative.");
         }
-
-        if (amount <= 0) {
-            System.out.println("Transfer amount must be greater than 0.");
-            return false;
-        }
-
-        if (amount > getBank().getWithdrawLimit()) {
-            System.out.println("Transfer amount exceeds the bank's withdrawal limit of ₱" + getBank().getWithdrawLimit());
-            return false;
-        }
-
-        if (!hasEnoughBalance(amount + getBank().getProcessingFee())) {
-            System.out.println("Insufficient balance for this fund transfer. Please consider the processing fee.");
-            return false;
-        }
-
-        if (account instanceof SavingsAccount) {
-            SavingsAccount recipient = (SavingsAccount) account;
-
-            // Adjust balances with processing fee
-            adjustAccountBalance(-(amount + getBank().getProcessingFee()));
-            recipient.adjustAccountBalance(amount);
-
-            // Log transactions
-            addNewTransaction(getAccountNumber(), Transaction.Transactions.FundTransfer,
-                    String.format("Transfer to %s (Bank: %s): ₱%.2f (Fee: ₱%.2f)",
-                            account.getAccountNumber(), bank.getName(), amount, getBank().getProcessingFee()));
-            account.addNewTransaction(getAccountNumber(), Transaction.Transactions.Deposit,
-                    String.format("Transfer from %s (Bank: %s): ₱%.2f",
-                    getAccountNumber(), getBank().getName(), amount));
-
-            return true;
-        }
-
-        return false;
+        this.balance = balance;
     }
 
     /**
-     * Get the account balance statement of this savings account.
-     * @return - String balance statement.
+     * Retrieves the account balance statement.
+     *
+     * @return The formatted balance statement.
      */
     public String getAccountBalanceStatement() {
-        return "Current Balance: ₱" + balance;
+        return "SavingsAccount{" +
+                "Account Number='" + accountNumber + '\'' +
+                ", Owner='" + ownerFname + " " + ownerLname + '\'' +
+                ", Balance=$" + String.format("%.2f", balance) +
+                '}';
     }
 
     /**
-     * Validates whether this savings account has enough balance to proceed with such a transaction
-     * based on the amount that is to be adjusted.
-     * @param amount - Amount of money to be supposedly adjusted from this account’s balance.
-     * @return - Flag if transaction can proceed by adjusting the account balance by the amount to be
-     * changed.
+     * Checks if the account has enough balance for a transaction.
+     *
+     * @param amount The amount to check.
+     * @return True if there is enough balance, false otherwise.
      */
     public boolean hasEnoughBalance(double amount) {
         return balance >= amount;
     }
 
     /**
-     * Warns the account owner that their balance is not enough for the transaction to proceed
-     * successfully.
+     * Displays a warning when the account has insufficient balance.
      */
     public void insufficientBalance() {
-        System.out.println("Insufficient balance for the requested transaction.");
+        System.out.println("Warning: Insufficient balance to complete the transaction.");
     }
 
     /**
-     * Adjust the account balance of this savings account based on the amount to be adjusted. If it
-     * results to the account balance going less than 0.0, then it is forcibly reset to 0.0.
-     * @param amount - Amount to be added or subtracted from the account balance.
+     * Adjusts the account balance of this savings account.
+     *
+     * @param amount The amount to adjust.
      */
     public void adjustAccountBalance(double amount) {
         this.balance += amount;
-        if (balance < 0.0) {
-            balance = 0.0;
+        if (this.balance < 0) {
+            this.balance = 0; // Prevent negative balances
         }
     }
 
     /**
-     * String representation of the savings account
+     * Deposits an amount into this savings account.
      *
-     * @return String representation of the savings account
+     * @param amount The amount to deposit.
+     * @return True if deposit is successful, false otherwise.
      */
-    @Override
-    public String toString() {
-        return String.format("%sn%s", super.toString(), getAccountBalanceStatement());
+    public boolean cashDeposit(double amount) {
+        if (amount > bank.getDepositLimit()) {
+            System.out.println("Deposit amount exceeds the bank's limit.");
+            return false;
+        }
+        this.adjustAccountBalance(amount);
+
+        // Ensure a transaction log is added for the deposit
+        this.addNewTransaction(this.getAccountNumber(), Transaction.Transactions.DEPOSIT,
+                "Deposited $" + amount);
+
+        return true;
+    }
+
+    /**
+     * Withdraws an amount from this savings account.
+     *
+     * @param amount The amount to withdraw.
+     * @return True if withdrawal is successful, false otherwise.
+     */
+    public boolean withdrawal(double amount) {
+        if (amount <= 0 || amount > balance || amount > bank.getWithdrawLimit()) {
+            insufficientBalance();
+            return false; // Cannot withdraw more than available balance or withdrawal limit
+        }
+
+        // Adjust balance and log transaction
+        adjustAccountBalance(-amount);
+        addNewTransaction(accountNumber, Transaction.Transactions.WITHDRAWAL,
+                "Withdrew $" + String.format("%.2f", amount));
+
+        return true;
+    }
+
+    /**
+     * Transfers funds to another SavingsAccount.
+     * <p>
+     * Internal transfers occur within the same bank, while external transfers include processing fees.
+     *
+     * @param recipient The recipient account.
+     * @param amount    The amount to transfer.
+     * @return True if the transfer was successful, false otherwise.
+     * @throws IllegalAccountType If attempting to transfer to a CreditAccount.
+     */
+    public boolean transfer(Account recipient, double amount) throws IllegalAccountType {
+        if (!(recipient instanceof SavingsAccount)) {
+            throw new IllegalAccountType("Cannot transfer funds to a CreditAccount.");
+        }
+
+        if (!hasEnoughBalance(amount) || amount <= 0 || amount > bank.getWithdrawLimit()) {
+            insufficientBalance();
+            return false; // Insufficient funds or exceeding withdrawal limit
+        }
+
+        // Deduct from sender and add to recipient
+        adjustAccountBalance(-amount);
+        ((SavingsAccount) recipient).adjustAccountBalance(amount);
+
+        // Log transactions for both accounts
+        addNewTransaction(recipient.getAccountNumber(), Transaction.Transactions.FUNDTRANSFER,
+                "Transferred $" + String.format("%.2f", amount) + " to " + recipient.getAccountNumber());
+        recipient.addNewTransaction(accountNumber, Transaction.Transactions.RECEIVE_TRANSFER,
+                "Received $" + String.format("%.2f", amount) + " from " + accountNumber);
+
+        return true;
+    }
+
+    /**
+     * Transfers funds to another SavingsAccount from a different bank, applying a processing fee.
+     *
+     * @param recipientBank The recipient's bank.
+     * @param recipient     The recipient account.
+     * @param amount        The amount to transfer.
+     * @return True if the transfer was successful, false otherwise.
+     * @throws IllegalAccountType If attempting to transfer to a CreditAccount.
+     */
+    public boolean transfer(Bank recipientBank, Account recipient, double amount) throws IllegalAccountType {
+        if (!(recipient instanceof SavingsAccount)) {
+            throw new IllegalAccountType("Cannot transfer funds to a CreditAccount.");
+        }
+
+        double totalAmount = amount + bank.getProcessingFee(); // Ensure sender pays fee
+
+        if (!hasEnoughBalance(totalAmount) || amount <= 0 || totalAmount > bank.getWithdrawLimit()) {
+            insufficientBalance();
+            return false; // Insufficient funds or exceeding withdrawal limit
+        }
+
+        // Deduct full amount from sender including processing fee
+        adjustAccountBalance(-totalAmount);
+
+        // Credit only the transferred amount (not including fee) to recipient
+        ((SavingsAccount) recipient).adjustAccountBalance(amount);
+
+        // Log transactions for both accounts
+        addNewTransaction(recipient.getAccountNumber(), Transaction.Transactions.EXTERNAL_TRANSFER,
+                "Transferred $" + String.format("%.2f", amount) + " to " + recipient.getAccountNumber() +
+                        " at " + recipientBank.getName() + " (Fee: $" + bank.getProcessingFee() + ")");
+
+        recipient.addNewTransaction(accountNumber, Transaction.Transactions.RECEIVE_TRANSFER,
+                "Received $" + String.format("%.2f", amount) + " from " + accountNumber +
+                        " at " + bank.getName());
+
+        return true;
+    }
+
+    public double getAccountBalance() {
+        return this.balance;
     }
 }

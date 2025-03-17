@@ -1,134 +1,102 @@
 package Accounts;
-import Main.Field;
-import Main.Main;
+
+import Bank.*;
+import Main.*;
 
 /**
- * Credit Account Launcher class for handling credit account operations
+ * CreditAccountLauncher handles user interactions for Credit Accounts,
+ * allowing credit payments and recompense.
  */
-public class CreditAccountLauncher extends AccountLauncher {
+public class CreditAccountLauncher {
+
+    private static CreditAccount loggedAccount;
+
     /**
-     * Method that deals with all things about credit accounts.
-     * Mainly utilized for showing the main menu after Credit Account users log in to the application.
+     * Initializes the Credit Account menu after login.
      */
     public static void creditAccountInit() {
+        if (loggedAccount == null) {
+            System.out.println("No account logged in.");
+            return;
+        }
+
         while (true) {
             Main.showMenuHeader("Credit Account Menu");
             Main.showMenu(41);
             Main.setOption();
-            Main.showMenu(Main.getOption(), 41);
 
             switch (Main.getOption()) {
-                case 1:
-                    Main.showMenuHeader("Loan Statement");
-                    System.out.println(getLoggedAccount().getLoanStatement());
-                    break;
-                case 2:
-                    creditPaymentProcess();
-                    break;
-                case 3:
-                    creditRecompenseProcess();
-                    break;
-                case 4:
-                    Main.showMenuHeader("Transaction History");
-                    System.out.println(getLoggedAccount().getTransactionsInfo());
-                    break;
-                case 5:
-                    destroyLogSession();
+                case 1 -> System.out.println(loggedAccount.getLoanStatement());
+                case 2 -> creditPaymentProcess();
+                case 3 -> creditRecompenseProcess();
+                case 4 -> System.out.println(loggedAccount.getTransactionsInfo());
+                case 5 -> {
                     return;
-                default:
-                    System.out.println("Invalid choice. Please try again.");
+                }
+                default -> System.out.println("Invalid option. Try again.");
             }
         }
     }
 
     /**
-     * Method that is utilized to process the credit payment transaction.
-     *
-     * @throws IllegalAccountType
+     * Handles the credit payment process.
      */
     public static void creditPaymentProcess() {
-        Main.showMenuHeader("Credit Payment Process");
+        Field<String, Integer> recipientField = new Field<String, Integer>("Recipient Account Number", String.class, 5, new Field.StringFieldLengthValidator());
+        recipientField.setFieldValue("Enter recipient Savings Account number: ");
 
-        String accountNum = Main.prompt("Account Number: ", true);
-        double amount = Double.parseDouble(Main.prompt("Amount: ", true));
+        Field<Double, Double> amountField = new Field<Double, Double>("Payment Amount", Double.class, 1.0, new Field.DoubleFieldValidator());
+        amountField.setFieldValue("Enter payment amount: ");
 
-        if (getLoggedAccount() == null) {
-            System.out.println("No logged-in credit account.");
+        String recipientAccountNum = recipientField.getFieldValue();
+        double amount = amountField.getFieldValue();
+
+        Bank recipientBank = loggedAccount.getBank();
+        Account recipientAccount = recipientBank.getBankAccount(recipientAccountNum);
+
+        if (!(recipientAccount instanceof SavingsAccount)) {
+            System.out.println("Recipient account not found or is not a Savings Account.");
             return;
         }
 
-        Account account = getAssocBank().getBankAccount(getAssocBank(), accountNum);
-        if (account == null) {
-            System.out.println("The specified account does not exist.");
-            return;
+        if (loggedAccount.pay(recipientAccount, amount)) {
+            System.out.println("Credit payment successful.");
+        } else {
+            System.out.println("Credit payment failed. Insufficient funds or invalid amount.");
         }
 
-        try {
-            if (getLoggedAccount().pay(account, amount)) {
-            getLoggedAccount().addNewTransaction(
-                getLoggedAccount().getAccountNumber(),
-                Transaction.Transactions.Payment, "A successful payment.");
-            System.out.println("Payment successful!");
-            } else {
-            System.out.println("Payment unsuccessful!");
-            }
-        } catch (IllegalAccountType e) {
-            System.out.println("An error occurred during the payment process: " + e.getMessage());
+    }
+
+    /**
+     * Handles the credit recompense process.
+     */
+    public static void creditRecompenseProcess() {
+        Field<Double, Double> amountField = new Field<Double, Double>("Recompense Amount", Double.class, 1.0, new Field.DoubleFieldValidator());
+        amountField.setFieldValue("Enter recompense amount: ");
+
+        double amount = amountField.getFieldValue();
+
+        if (loggedAccount.recompense(amount)) {
+            System.out.println("Recompense successful.");
+        } else {
+            System.out.println("Recompense failed. Amount exceeds loan balance.");
         }
     }
 
-
     /**
-     * Method that is utilized to process the credit compensation transaction.
+     * Sets the currently logged-in Credit Account.
+     *
+     * @param account The logged-in CreditAccount.
      */
-    public static void creditRecompenseProcess() {
-        if (getLoggedAccount() == null) {
-            System.out.println("No logged-in credit account.");
-            return;
-        }
-    
-        // Create a field validator for positive values
-        Field<Double, Double> amountField = new Field<>(
-            "Recompense Amount", 
-            Double.class, 
-            0.01,
-            new Field.DoubleFieldValidator()
-        );
-    
-        // Prompt the user for input and validate it
-        amountField.setFieldValue("Enter recompense amount: ");
-    
-        double amount = amountField.getFieldValue();
-    
-        if (getLoggedAccount().recompense(amount)) {
-            getLoggedAccount().addNewTransaction(
-                getLoggedAccount().getAccountNumber(), 
-                Transaction.Transactions.Recompense, 
-                "A successful recompense."
-            );
-            System.out.println("Recompense successful!");
-        } else {
-            System.out.println("Recompense unsuccessful!");
-        }
+    public static void setLoggedAccount(CreditAccount account) {
+        loggedAccount = account;
     }
 
     /**
      * Get the Credit Account instance of the currently logged account.
-     *
-     * @return CreditAccount object
+     * @return The currently logged account
      */
     public static CreditAccount getLoggedAccount() {
-        Account account = AccountLauncher.getLoggedAccount();
-        if (account == null) {
-            System.out.println("No logged-in account.");
-            return null;
-        }
-        
-        if (account instanceof CreditAccount) {
-            return (CreditAccount) account;
-        } else {
-            System.out.println("Logged-in account is not a credit account.");
-            return null;
-        }
+        return loggedAccount;
     }
 }
