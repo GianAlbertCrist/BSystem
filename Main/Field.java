@@ -170,7 +170,7 @@ public class Field<T, E> {
             if (value == null || !value.matches("\\d{" + threshold + "}")) {
                 return "Invalid PIN! Please enter exactly " + threshold + " digits.";
             }
-            return null; // Valid PIN
+            return null;
         }
     }
 }

@@ -1,7 +1,7 @@
 package Accounts;
 
-import java.util.ArrayList;
 import Bank.Bank;
+import java.util.ArrayList;
 
 /**
  * Abstract Account class that serves as a base for different account types.
@@ -9,14 +9,11 @@ import Bank.Bank;
  */
 public abstract class Account {
 
-    // Core Attributes
     protected final Bank bank;
     protected final String accountNumber;
     protected final ArrayList<Transaction> transactions;
-
-    // Owner Details
-    protected final String ownerFname, ownerLname, ownerEmail;   // Owner's first name
-    protected final String pin;          // 4-digit security PIN (hashed for security in real-world apps)
+    protected final String ownerFname, ownerLname, ownerEmail;
+    protected final String pin;
 
     /**
      * Constructor for an Account.
@@ -40,7 +37,7 @@ public abstract class Account {
     }
 
     public String getOwnerFullName() {
-        return this.ownerFname + " " + this.ownerLname;
+        return String.format("%s %s",this.ownerFname, this.ownerLname);
     }
 
     /**
@@ -71,8 +68,7 @@ public abstract class Account {
         return transactionLog.toString();
     }
 
-    // =================== Getters for Personal Details ===================
-
+    //Getters
     public String getOwnerFname() {
         return ownerFname;
     }
@@ -88,8 +84,6 @@ public abstract class Account {
     public String getPin() {
         return pin;
     }
-
-    // =================== Bank and Transaction Getters ===================
 
     public Bank getBank() {
         return bank;
@@ -110,12 +104,7 @@ public abstract class Account {
      */
     @Override
     public String toString() {
-        return "Account {" +
-                "Owner='" + ownerFname + " " + ownerLname + '\'' +
-                ", Email='" + ownerEmail + '\'' +
-                ", Bank='" + bank.getName() + '\'' +
-                ", Account Number='" + accountNumber + '\'' +
-                ", Transactions Count=" + transactions.size() +
-                '}';
+        return String.format("Account{Owner: %s, Email: %s, Bank: %s, Account Number: %s, Transactions Count: %d}",
+                                    getOwnerFullName(), ownerEmail, bank.getName(), accountNumber, transactions.size());
     }
 }

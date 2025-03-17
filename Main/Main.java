@@ -28,52 +28,51 @@ public class Main
             showMenuHeader("Main Menu");
             showMenu(1);
             setOption();
+
             // Account Option
-            if (getOption() == 1) {
-                showMenuHeader("Account Login");
-                showMenu(Menu.AccountLogin.menuIdx);
-                setOption();
+            switch (getOption()) {
+                case 1:
+                    showMenuHeader("Account Login");
+                    showMenu(2);
+                    setOption();
 
-                if (getOption() == 1) {
-                    Bank selectedBank = AccountLauncher.selectBank();
+                    if (getOption() == 1) {
+                        Bank selectedBank = AccountLauncher.selectBank();
+                        
+                        if (selectedBank == null) {
+                            showMenuHeader("Create New Bank");
+                            BankLauncher.createNewBank();
+                            break;
+                        }
+                        
+                        AccountLauncher accountLauncher = new AccountLauncher();
+                        accountLauncher.setAssocBank(selectedBank);
+                        accountLauncher.accountLogin();
+                    }   break;
 
-                    if (selectedBank == null) {
-                        System.out.println("Invalid bank selection.");
-                        return;
-                    }
-
-                    AccountLauncher accountLauncher = new AccountLauncher();
-                    accountLauncher.setAssocBank(selectedBank);
-                    accountLauncher.accountLogin();
-                }
-            }
-            // Bank Option
-            else if (getOption() == 2)
-            {
-                showMenuHeader("Bank Operations");
-                showMenu(Menu.BankLogin.menuIdx);
-                setOption();
-
-                switch (getOption()) {
-                    case 1 -> BankLauncher.bankLogin();
-                    case 2 -> System.out.println("Exiting Bank Operations"); // BankLauncher.showBanksMenu();
-                    default -> System.out.println("Invalid bank menu option.");
-                }
-            }
             // Create New Bank
-            else if (getOption() == 3)
-            {
-                showMenuHeader("Create New Bank");
-                BankLauncher.createNewBank();
-            }
-            else if (getOption() == 4)
-            {
-                System.out.println("Exiting. Thank you for banking!");
-                System.exit(0);
-            }
-            else
-            {
-                System.out.println("Invalid option!");
+                case 2:
+                    showMenuHeader("Bank Operations");
+                    showMenu(Menu.BankLogin.menuIdx);
+                    setOption();
+                    switch (getOption()) {
+                        case 1 -> BankLauncher.bankLogin();
+                        case 2 -> System.out.println("Exiting Bank Operations"); // BankLauncher.showBanksMenu();
+                        default -> System.out.println("Invalid bank menu option.");
+                    }   break;
+
+                case 3:
+                    showMenuHeader("Create New Bank");
+                    BankLauncher.createNewBank();
+                    break;
+
+                case 4:
+                    System.out.println("Exiting. Thank you for banking!");
+                    System.exit(0);
+
+                default:
+                    System.out.println("Invalid option!");
+                    break;
             }
         }
     }

@@ -78,8 +78,8 @@ public class SavingsAccountLauncher {
 
         // Prompt user for transaction type (Internal or External)
         Main.showMenuHeader("Fund Transfer Type");
-        System.out.println("[1] Internal Transfer (Same Bank)");
-        System.out.println("[2] External Transfer (Different Bank)");
+        System.out.println("[1] Internal Transfer (Account Within this Bank)");
+        System.out.println("[2] External Transfer (Account from Different Bank)");
         Main.setOption();
         int transferType = Main.getOption();
 
@@ -97,14 +97,14 @@ public class SavingsAccountLauncher {
             Account recipient = loggedAccount.getBank().getBankAccount(recipientAccountNum);
 
             if (!(recipient instanceof SavingsAccount)) {
-                System.out.println("❌ Recipient account not found or is not a Savings Account.");
+                System.out.println("Recipient account not found or is not a Savings Account.");
                 return;
             }
 
             if (loggedAccount.transfer(recipient, amount)) {
-                System.out.println("✅ Internal transfer successful.");
+                System.out.println("Internal transfer successful.");
             } else {
-                System.out.println("❌ Transfer failed. Insufficient funds or limit exceeded.");
+                System.out.println("Transfer failed. Insufficient funds or limit exceeded.");
             }
 
 
@@ -116,33 +116,33 @@ public class SavingsAccountLauncher {
 
             Bank recipientBank = null;
             for (Bank bank : BankLauncher.getBanks()) {
-                if (bank.getBankId() == recipientBankId) {  // ✅ Use == for primitive int comparison
+                if (bank.getBankId() == recipientBankId) {
                     recipientBank = bank;
                     break;
                 }
             }
 
             if (recipientBank == null) {
-                System.out.println("❌ Recipient bank not found.");
+                System.out.println("Recipient bank not found.");
                 return;
             }
 
             Account recipient = recipientBank.getBankAccount(recipientAccountNum);
 
             if (!(recipient instanceof SavingsAccount)) {
-                System.out.println("❌ Recipient account not found or is not a Savings Account.");
+                System.out.println("Recipient account not found or is not a Savings Account.");
                 return;
             }
 
             if (loggedAccount.transfer(recipientBank, recipient, amount)) {
-                System.out.println("✅ External transfer successful. Processing fee of $" +
+                System.out.println("External transfer successful. Processing fee of Php" +
                         loggedAccount.getBank().getProcessingFee() + " applied.");
             } else {
-                System.out.println("❌ Transfer failed. Insufficient funds or limit exceeded.");
+                System.out.println("Transfer failed. Insufficient funds or limit exceeded.");
             }
 
         } else {
-            System.out.println("❌ Invalid selection.");
+            System.out.println("Invalid selection.");
         }
     }
 

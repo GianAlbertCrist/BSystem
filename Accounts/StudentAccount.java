@@ -36,7 +36,7 @@ public class StudentAccount extends SavingsAccount {
         // Adjust balance and log transaction
         adjustAccountBalance(-amount);
         addNewTransaction(this.getAccountNumber(), Transaction.Transactions.WITHDRAWAL,
-                "Withdrew $" + String.format("%.2f", amount) + " from Student Account.");
+                String.format("Withdrew Php %.2f from Student Account.", amount));
         return true;
     }
 
@@ -64,20 +64,16 @@ public class StudentAccount extends SavingsAccount {
 
         // Log transactions for both accounts
         addNewTransaction(recipient.getAccountNumber(), Transaction.Transactions.FUNDTRANSFER,
-                "Transferred $" + String.format("%.2f", amount) + " to " + recipient.getAccountNumber());
+                String.format("Transferred Php %.2f to %s", amount, recipient.getAccountNumber()));
         recipient.addNewTransaction(getAccountNumber(), Transaction.Transactions.FUNDTRANSFER,
-                "Received $" + String.format("%.2f", amount) + " from Student Account.");
+                String.format("Received Php %.2f from Student Account.", amount));
         return true;
     }
 
     @Override
     public String toString() {
-        return "StudentAccount{" +
-                "accountNumber='" + getAccountNumber() + '\'' +
-                ", owner='" + getOwnerFname() + " " + getOwnerLname() + '\'' +
-                ", balance=$" + String.format("%.2f", getAccountBalance()) +
-                ", withdrawalLimit=$" + String.format("%.2f", MAX_WITHDRAWAL_LIMIT) +
-                '}';
+        return String.format("StudentAccount{Account Number: %s, Owner: %s, Balance: %.2f, Withdrawal Limit: %.2f}",
+                                    getAccountNumber(), getOwnerFullName(), getAccountBalance(), MAX_WITHDRAWAL_LIMIT);
     }
 
 }

@@ -2,7 +2,6 @@ package Bank;
 
 import Accounts.*;
 import Main.*;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Objects;
@@ -56,9 +55,9 @@ public class BankLauncher {
     public static void addBank(Bank b) {
         if (!banks.contains(b)) {
             banks.add(b);
-            System.out.println("✅ Bank successfully added: " + b.getName());
+            System.out.println("Bank successfully added: " + b.getName());
         } else {
-            System.out.println("⚠ Bank already exists.");
+            System.out.println("Bank already exists.");
         }
     }
 
@@ -88,7 +87,7 @@ public class BankLauncher {
 
         // If bank is not found
         if (selectedBank == null) {
-            System.out.println("❌ Error: No bank found with the name \"" + bankName + "\".");
+            System.out.println("Error: No bank found with the name \"" + bankName + "\".");
             return;
         }
 
@@ -97,13 +96,13 @@ public class BankLauncher {
 
         // Validate Passcode
         if (!selectedBank.getPasscode().equals(passcode)) {
-            System.out.println("❌ Error: Incorrect passcode. Access denied.");
+            System.out.println("Error: Incorrect passcode. Access denied.");
             return;
         }
 
         // Set logged-in session
         setLogSession(selectedBank);
-        System.out.println("✅ Successfully logged into " + loggedBank.getName());
+        System.out.println("Successfully logged into " + loggedBank.getName());
         bankInit();
     }
 
@@ -116,7 +115,7 @@ public class BankLauncher {
             System.out.println("No banks have been registered yet.");
             return;
         }
-        System.out.println("\n📌 List of Registered Banks:");
+        System.out.println("\nList of Registered Banks:");
         System.out.printf("%-3s | %-30s | %s%n", "#", "Bank Name", "Bank ID");
         System.out.println("-----------------------------------------------------");
         for (int i = 0; i < banks.size(); i++) {
@@ -223,7 +222,7 @@ public class BankLauncher {
         bankNameField.setFieldValue("Enter Bank Name: ", false);
 
         if (bankNameField.getFieldValue().isEmpty()) {
-            System.out.println("❌ Error: Bank Name is required!");
+            System.out.println("Error: Bank Name is required!");
             return; // Exit early
         }
 
@@ -231,13 +230,12 @@ public class BankLauncher {
         bankPasscodeField.setFieldValue("Enter Bank Passcode: ");
 
         if (bankPasscodeField.getFieldValue() == null || bankPasscodeField.getFieldValue().length() < 4) {
-            System.out.println("❌ Error: Passcode must be at least 4 characters long.");
+            System.out.println("Error: Passcode must be at least 4 characters long.");
             return; // Exit early
         }
 
         // Ask user if they want to set custom limits
-        System.out.println("Do you want to set custom deposit, withdrawal, and credit limits? (Y/N): ");
-        String choice = Main.prompt("", true).trim().toUpperCase();
+        String choice = Main.prompt("Do you want to set custom deposit, withdrawal, and credit limits? (Y/N):", true).trim().toUpperCase();
 
         Bank newBank;
 
@@ -276,7 +274,7 @@ public class BankLauncher {
 
         // Add Bank to the List
         addBank(newBank);
-        System.out.println("✅ Bank created successfully: " + newBank);
+        System.out.println("Bank created successfully: " + newBank);
     }
 
     /**

@@ -163,7 +163,7 @@ public class Bank {
             return;
         }
         bankAccounts.add(account);
-        System.out.println("✅ Account successfully registered.");
+        System.out.println("Account successfully registered.");
     }
 
     /**
@@ -176,15 +176,14 @@ public class Bank {
      */
     public static boolean accountExists(Bank bank, String accountNum) {
         if (bank == null || bank.getBankAccounts() == null) {
-            return false; // Handle null cases safely
+            return false;
         }
 
         return bank.getBankAccounts().stream()
                 .anyMatch(account -> account.getAccountNumber().equals(accountNum));
     }
 
-    // ========================= GETTERS =========================
-
+    //Getters
     public String getName() {
         return bankName;
     }
@@ -198,7 +197,7 @@ public class Bank {
     }
 
     public ArrayList<Account> getBankAccounts() {
-        return new ArrayList<>(bankAccounts); // Return a copy to prevent external modification
+        return new ArrayList<>(bankAccounts);
     }
 
     public double getDepositLimit() {
@@ -217,16 +216,12 @@ public class Bank {
         return processingFee;
     }
 
-    // ========================= COMPARATORS =========================
+    //Comparators
 
     @Override
     public String toString() {
-        return "Bank{" +
-                "Bank ID='" + bankId + '\'' +
-                "Bank Name='" + bankName + '\'' +
-                ", Bank Passcode='" + passcode + '\'' +
-                ", Accounts Registered=" + bankAccounts.size() +
-                '}';
+        return String.format("Bank{Bank ID: %d,Bank Name: %s, Bank Passcode: %s, # of Account Registered: %d}",
+                                    bankId, bankName, passcode, bankAccounts.size());
     }
 
     public static class BankCredentialsComparator implements Comparator<Bank> {

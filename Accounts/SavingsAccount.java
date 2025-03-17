@@ -37,11 +37,8 @@ public class SavingsAccount extends Account implements Withdrawal, Deposit, Fund
      * @return The formatted balance statement.
      */
     public String getAccountBalanceStatement() {
-        return "SavingsAccount{" +
-                "Account Number='" + accountNumber + '\'' +
-                ", Owner='" + ownerFname + " " + ownerLname + '\'' +
-                ", Balance=$" + String.format("%.2f", balance) +
-                '}';
+        return String.format("SavingsAccount{Account Number: %s, Owner: %s, Balance: Php %.2f}", 
+                                    this.accountNumber, getOwnerFullName(), this.balance);
     }
 
     /**
@@ -88,7 +85,7 @@ public class SavingsAccount extends Account implements Withdrawal, Deposit, Fund
 
         // Ensure a transaction log is added for the deposit
         this.addNewTransaction(this.getAccountNumber(), Transaction.Transactions.DEPOSIT,
-                "Deposited $" + amount);
+                "Deposited Php " + amount);
 
         return true;
     }
@@ -99,6 +96,7 @@ public class SavingsAccount extends Account implements Withdrawal, Deposit, Fund
      * @param amount The amount to withdraw.
      * @return True if withdrawal is successful, false otherwise.
      */
+    @Override
     public boolean withdrawal(double amount) {
         if (amount <= 0 || amount > balance || amount > bank.getWithdrawLimit()) {
             insufficientBalance();
@@ -108,7 +106,7 @@ public class SavingsAccount extends Account implements Withdrawal, Deposit, Fund
         // Adjust balance and log transaction
         adjustAccountBalance(-amount);
         addNewTransaction(accountNumber, Transaction.Transactions.WITHDRAWAL,
-                "Withdrew $" + String.format("%.2f", amount));
+                String.format("Withdraw Php %.2f", amount));
 
         return true;
     }
@@ -123,6 +121,7 @@ public class SavingsAccount extends Account implements Withdrawal, Deposit, Fund
      * @return True if the transfer was successful, false otherwise.
      * @throws IllegalAccountType If attempting to transfer to a CreditAccount.
      */
+    @Override
     public boolean transfer(Account recipient, double amount) throws IllegalAccountType {
         if (!(recipient instanceof SavingsAccount)) {
             throw new IllegalAccountType("Cannot transfer funds to a CreditAccount.");
@@ -139,9 +138,9 @@ public class SavingsAccount extends Account implements Withdrawal, Deposit, Fund
 
         // Log transactions for both accounts
         addNewTransaction(recipient.getAccountNumber(), Transaction.Transactions.FUNDTRANSFER,
-                "Transferred $" + String.format("%.2f", amount) + " to " + recipient.getAccountNumber());
+                String.format("Transferred Php %.2f to %s", amount, recipient.getAccountNumber()));
         recipient.addNewTransaction(accountNumber, Transaction.Transactions.RECEIVE_TRANSFER,
-                "Received $" + String.format("%.2f", amount) + " from " + accountNumber);
+                String.format("Received Php %.2f from %s", amount, accountNumber));
 
         return true;
     }
@@ -175,12 +174,11 @@ public class SavingsAccount extends Account implements Withdrawal, Deposit, Fund
 
         // Log transactions for both accounts
         addNewTransaction(recipient.getAccountNumber(), Transaction.Transactions.EXTERNAL_TRANSFER,
-                "Transferred $" + String.format("%.2f", amount) + " to " + recipient.getAccountNumber() +
-                        " at " + recipientBank.getName() + " (Fee: $" + bank.getProcessingFee() + ")");
+                String.format("Transferred Php %.2f to %s at %s (Fee: Php %.2f)", 
+                                    amount, recipient.getAccountNumber(), recipientBank.getName(), bank.getProcessingFee()));
 
         recipient.addNewTransaction(accountNumber, Transaction.Transactions.RECEIVE_TRANSFER,
-                "Received $" + String.format("%.2f", amount) + " from " + accountNumber +
-                        " at " + bank.getName());
+                String.format("Received Php %.2f from %s at %s", amount, this.accountNumber, bank.getName()));
 
         return true;
     }

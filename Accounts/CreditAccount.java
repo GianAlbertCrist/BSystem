@@ -32,11 +32,8 @@ public class CreditAccount extends Account implements Payment, Recompense {
      * @return Formatted loan statement.
      */
     public String getLoanStatement() {
-        return "CreditAccount{" +
-                "Account Number='" + accountNumber + '\'' +
-                ", Owner='" + ownerFname + " " + ownerLname + '\'' +
-                ", Loan Balance=$" + String.format("%.2f", loanBalance) +
-                '}';
+        return String.format("CreditAccount{Account Number: %s, Owner: %s, Loan Balance: Php %.2f}",
+                                    accountNumber, getOwnerFullName(), loanBalance);
     }
 
     /**
@@ -93,12 +90,12 @@ public class CreditAccount extends Account implements Payment, Recompense {
 
         // Log the transaction for both accounts
         addNewTransaction(recipient.getAccountNumber(), Transaction.Transactions.PAYMENT,
-                "Paid $" + String.format("%.2f", amount) + " to " + recipient.getAccountNumber());
+                String.format("Paid Php %.2f to %s", amount, recipient.getAccountNumber()));
 
         savingsRecipient.addNewTransaction(this.accountNumber, Transaction.Transactions.RECEIVE_TRANSFER,
-                "Received $" + String.format("%.2f", amount) + " from Credit Account " + this.accountNumber);
+                String.format("Received Php %.2f from Credit Account %s", amount, this.accountNumber));
 
-        System.out.println("Payment successful. New loan balance: $" + loanBalance);
+        System.out.println("Payment successful. New loan balance: Php" + this.loanBalance);
         return true;
     }
 
@@ -108,6 +105,7 @@ public class CreditAccount extends Account implements Payment, Recompense {
      * @param amount The amount to recompense.
      * @return True if successful, false otherwise.
      */
+    @Override
     public boolean recompense(double amount) {
         if (amount <= 0 || amount > loanBalance) {
             return false; // Invalid amount or exceeding owed loan

@@ -69,12 +69,12 @@ public class BusinessAccount extends CreditAccount {
 
         // Log the transaction
         addNewTransaction(recipient.getAccountNumber(), Transaction.Transactions.FUNDTRANSFER,
-                String.format("Paid $%.2f to %s (Business Transaction)", amount, recipient.getAccountNumber()));
+                String.format("Paid Php %.2f to %s (Business Transaction)", amount, recipient.getAccountNumber()));
 
         savingsRecipient.addNewTransaction(getAccountNumber(), Transaction.Transactions.FUNDTRANSFER,
-                String.format("Received $%.2f from Business Account %s", amount, getAccountNumber()));
+                String.format("Received Php %.2f from Business Account %s", amount, getAccountNumber()));
 
-        System.out.println("Business payment successful. New loan balance: $" + getLoan());
+        System.out.println("Business payment successful. New loan balance: Php" + getLoan());
         return true;
     }
 
@@ -94,18 +94,14 @@ public class BusinessAccount extends CreditAccount {
 
         // Log recompense transaction
         addNewTransaction(getAccountNumber(), Transaction.Transactions.COMPENSATION,
-                String.format("Recompensed $%.2f to the bank from Business Account.", amount));
+                String.format("Recompensed Php %.2f to the bank from Business Account.", amount));
 
         return true;
     }
     @Override
     public String toString() {
-        return "BusinessAccount{" +
-                "Account Number='" + getAccountNumber() + '\'' +
-                ", Owner='" + getOwnerFullName() + '\'' +
-                ", Loan Amount=" + getLoan() + // Use the getter method
-                ", Business Credit Limit=" + getBusinessCreditLimit() +
-                '}';
+        return String.format("BusinessAccount{Account Number: %s, Owner: %s, Loan Ammount: %s, Business Credit Limit: %s}",
+                                    getAccountNumber(), getOwnerFullName(), getLoan(), getBusinessCreditLimit());
     }
 
 
