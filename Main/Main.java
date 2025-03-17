@@ -1,9 +1,10 @@
 package Main;
 
 import Accounts.AccountLauncher;
-import Bank.BankLauncher;
+import Accounts.IllegalAccountType;
+import Bank.*;
+
 import java.util.Scanner;
-import javax.sound.sampled.SourceDataLine;
 
 public class Main
 {
@@ -13,81 +14,65 @@ public class Main
      * Option field used when selection options during menu prompts. Do not create a different
      * option variable in menus. Just use this instead. <br>
      * As to how to utilize Field objects properly, refer to the following:
-     * 
+     *
      * @see #prompt(String, boolean)
      * @see #setOption() How Field objects are used.
      */
     public static Field<Integer, Integer> option = new Field<Integer, Integer>("Option",
             Integer.class, -1, new Field.IntegerFieldValidator());
 
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) throws IllegalAccountType {
+
         while (true)
         {
             showMenuHeader("Main Menu");
             showMenu(1);
             setOption();
+
             // Account Option
-            if (getOption() == 1) {
-                // READ ME: Refer to this code block on how one should properly utilize
-                // showMenuHeader(), showMenu(),
-                // setOption(), and getOption() methods...
-                showMenuHeader("Account Login Menu");
-                showMenu(2, 1);
-                setOption();
-                showMenu(getOption(), 1);
-                // TODO: Complete this portion
-                switch (getOption()) {
-                    case 1:
-                        if (BankLauncher.bankSize() == 1) {
-                            AccountLauncher.accountLogin();
-                        } else {
-                            System.out.println("No bank is currently available.");
-                        }
-                    case 2:
-                        continue;
-                    default:
-                        System.out.println("Invalid option!");
-                        break;
-                }
-                break;
-            }
-
-            // Bank Option
-            else if (getOption() == 2)
-            {
-                // TODO: Complete Bank option
-
-                while (true) {
-                    showMenuHeader("Bank Login Menu");
-                    showMenu(3,1);
+            switch (getOption()) {
+                case 1:
+                    showMenuHeader("Account Login");
+                    showMenu(2);
                     setOption();
-                    if (getOption()==1)
-                    {
-                        BankLauncher.bankLogin();
-                    }
-                    else if (getOption()==2)
-                    {
-                        break;
-                    }
-                    else{
-                        System.out.println("Invalid option!");
-                    }
-                }
-            }
+
+                    if (getOption() == 1) {
+                        Bank selectedBank = AccountLauncher.selectBank();
+                        
+                        if (selectedBank == null) {
+                            showMenuHeader("Create New Bank");
+                            BankLauncher.createNewBank();
+                            break;
+                        }
+                        
+                        AccountLauncher accountLauncher = new AccountLauncher();
+                        accountLauncher.setAssocBank(selectedBank);
+                        accountLauncher.accountLogin();
+                    }   break;
+
             // Create New Bank
-            else if (getOption() == 3)
-            {
-                // TODO: Complete this portion...
-            }
-            else if (getOption() == 4)
-            {
-                System.out.println("Exiting. Thank you for banking!");
-                break;
-            }
-            else
-            {
-                System.out.println("Invalid option!");
+                case 2:
+                    showMenuHeader("Bank Operations");
+                    showMenu(Menu.BankLogin.menuIdx);
+                    setOption();
+                    switch (getOption()) {
+                        case 1 -> BankLauncher.bankLogin();
+                        case 2 -> System.out.println("Exiting Bank Operations"); // BankLauncher.showBanksMenu();
+                        default -> System.out.println("Invalid bank menu option.");
+                    }   break;
+
+                case 3:
+                    showMenuHeader("Create New Bank");
+                    BankLauncher.createNewBank();
+                    break;
+
+                case 4:
+                    System.out.println("Exiting. Thank you for banking!");
+                    System.exit(0);
+
+                default:
+                    System.out.println("Invalid option!");
+                    break;
             }
         }
     }
@@ -96,7 +81,7 @@ public class Main
      * Show menu based on index given. <br>
      * Refer to Menu enum for more info about menu indexes. <br>
      * Use this method if you want a single menu option every line.
-     * 
+     *
      * @param menuIdx Main.Menu index to be shown
      */
     public static void showMenu(int menuIdx)
@@ -107,7 +92,7 @@ public class Main
     /**
      * Show menu based on index given. <br>
      * Refer to Menu enum for more info about menu indexes.
-     * 
+     *
      * @param menuIdx Main.Menu index to be shown
      * @param inlineTexts Number of menu options in a single line. Set to 1 if you only want a
      *        single menu option every line.
@@ -140,7 +125,7 @@ public class Main
     /**
      * Prompt some input to the user. Only receives on non-space containing String. This string can
      * then be parsed into targeted data type using DataTypeWrapper.parse() method.
-     * 
+     *
      * @param phrase Prompt to the user.
      * @param inlineInput A flag to ask if the input is just one entire String or receive an entire
      *        line input. <br>
@@ -163,7 +148,7 @@ public class Main
 
     /**
      * Prompts user to set an option based on menu outputted.
-     * 
+     *
      * @throws NumberFormatException May happen if the user attempts to input something other than
      *         numbers.
      */
@@ -182,7 +167,7 @@ public class Main
 
     /**
      * Used for printing the header whenever a new menu is accessed.
-     * 
+     *
      * @param menuTitle Title of the menu to be outputted.
      */
     public static void showMenuHeader(String menuTitle)
