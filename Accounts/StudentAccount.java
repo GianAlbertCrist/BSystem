@@ -67,7 +67,7 @@ public class StudentAccount extends SavingsAccount {
                 String.format("Transferred Php %.2f to %s", amount, recipient.getAccountNumber()));
         recipient.addNewTransaction(getAccountNumber(), Transaction.Transactions.FUNDTRANSFER,
                 String.format("Received Php %.2f from Student Account.", amount));
-        return true;
+
     }
 
     @Override
