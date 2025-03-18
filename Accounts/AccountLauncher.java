@@ -1,7 +1,7 @@
 package Accounts;
 
-import Bank.BankLauncher;
 import Bank.Bank;
+import Bank.BankLauncher;
 import Main.*;
 
 /**
@@ -23,6 +23,15 @@ public class AccountLauncher {
     }
 
     /**
+     * Verifies if some account is currently logged in.
+     *
+     * @return true if an account is logged in, false otherwise
+     */
+    public boolean isLoggedIn() {
+        return loggedAccount != null;
+    }
+
+    /**
      * Login an account. Bank must be selected first before logging in. Account existence will depend
      * on the selected bank.
      */
@@ -34,7 +43,7 @@ public class AccountLauncher {
 
         // Prompt user to select account type
         Main.showMenuHeader("Select Account Type");
-        Main.showMenu(Menu.AccountTypeSelection.menuIdx);
+        Main.showMenu(33);
         Main.setOption();
 
         int accountTypeOption = Main.getOption();
@@ -96,7 +105,6 @@ public class AccountLauncher {
 
     /**
      * Bank selection screen before the user is prompted to log in. User is prompted for the Bank ID
-     * with corresponding bank name.
      *
      * @return Bank object based on selected ID.
      */
@@ -112,18 +120,6 @@ public class AccountLauncher {
 
         int bankIndex = Main.getOption();
         return BankLauncher.getBankByIndex(bankIndex).orElse(null); // Unwrapping Optional
-    }
-
-    /**
-     * Checks inputted credentials during account login.
-     *
-     * @param accountNumber Account number.
-     * @param pin 4-digit pin.
-     * @return Account object if it passes verification.
-     */
-    private boolean checkCredentials(String accountNumber, String pin) {
-        Account account = assocBank.getBankAccount(accountNumber);
-        return account != null && account.getPin().equals(pin);
     }
 
     /**
@@ -144,11 +140,14 @@ public class AccountLauncher {
     }
 
     /**
-     * Verifies if some account is currently logged in.
+     * Checks inputted credentials during account login.
      *
-     * @return true if an account is logged in, false otherwise
+     * @param accountNumber Account number.
+     * @param pin 4-digit pin.
+     * @return Account object if it passes verification.
      */
-    public boolean isLoggedIn() {
-        return loggedAccount != null;
+    private boolean checkCredentials(String accountNumber, String pin) {
+        Account account = assocBank.getBankAccount(accountNumber);
+        return account != null && account.getPin().equals(pin);
     }
 }

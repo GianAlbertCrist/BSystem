@@ -109,7 +109,6 @@ public class Bank {
 
         Field<String, String> emailField = new Field<String, String>("Email", String.class, null, new Field.StringFieldValidator());
 
-
         // Array of fields to prompt user input
         Field<?, ?>[] fields = {accountNumberField, pinField, firstNameField, lastNameField, emailField};
 
@@ -134,7 +133,6 @@ public class Bank {
         String lastName = (String) accountData.get(3).getFieldValue();
         String email = (String) accountData.get(4).getFieldValue();
 
-        // Use Main.prompt() instead of new Scanner(System.in)
         double initialDeposit = Double.parseDouble(Main.Main.prompt("Enter Initial Deposit: ", true));
 
         SavingsAccount newAccount = new SavingsAccount(this, accountNumber, pin, firstName, lastName, email, initialDeposit);
@@ -224,14 +222,13 @@ public class Bank {
         return processingFee;
     }
 
-    //Comparators
-
     @Override
     public String toString() {
         return String.format("Bank{Bank ID: %d,Bank Name: %s, Bank Passcode: %s, # of Account Registered: %d}",
-                                    bankId, bankName, "*".repeat(passcode.length()), bankAccounts.size());
+                                    bankId, bankName, passcode, bankAccounts.size());
     }
 
+    //Comparators
     /**
      * A comparator that compares if two bank objects are the same.
      */

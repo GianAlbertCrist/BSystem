@@ -36,6 +36,11 @@ public class CreditAccount extends Account implements Payment, Recompense {
                                     accountNumber, getOwnerFullName(), loanBalance);
     }
 
+    //Getter
+    public double getLoan() {
+        return this.loanBalance;
+    }
+
     /**
      * Checks if this credit account can do additional credit transactions if the amount to credit will not
      * exceed the credit limit set by the bank associated to this Credit Account.
@@ -112,17 +117,14 @@ public class CreditAccount extends Account implements Payment, Recompense {
 
         // Deduct from the loan balance and log the recompense
         adjustLoanAmount(-amount);
-        addNewTransaction(getAccountNumber(), Transaction.Transactions.Recompense,
-                String.format("Recompensed Php %s to the bank.", amount));
+//        addNewTransaction(getAccountNumber(), Transaction.Transactions.Recompense,
+//                String.format("Recompensed Php %s to the bank.", amount));
 
         return true;
     }
 
+    @Override
     public String toString(){
         return "Credit Account " + super.toString();
-    }
-
-    public double getLoan() {
-        return this.loanBalance;
     }
 }

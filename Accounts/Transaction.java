@@ -20,43 +20,26 @@ public class Transaction {
         Recompense
     }
 
-    private final String sourceAccount;
-    private final Transactions transactionType;
-    private final String description;
+    /**
+     * Account number that triggered this transaction.
+     */
+    public String accountNumber;
+    /**
+     * Type of transaction that was triggered.
+     */
+    public Transactions transactionType;
+    /**
+     * Description of the transaction.
+     */
+    public String description;
+
     private final LocalDateTime timestamp;
 
-    public Transaction(String sourceAccount, Transactions transactionType, String description) {
-        this.sourceAccount = sourceAccount;
+    public Transaction(String accountNumber, Transactions transactionType, String description) {
+        this.accountNumber = accountNumber;
         this.transactionType = transactionType;
         this.description = description;
-        this.timestamp = LocalDateTime.now(); // Auto-generate timestamp upon creation
-    }
-
-    /**
-     * Retrieves the account number that initiated this transaction.
-     *
-     * @return Source account number.
-     */
-    public String getSourceAccount() {
-        return sourceAccount;
-    }
-
-    /**
-     * Retrieves the type of this transaction.
-     *
-     * @return Transaction type.
-     */
-    public Transactions getTransactionType() {
-        return transactionType;
-    }
-
-    /**
-     * Retrieves the description of this transaction.
-     *
-     * @return Transaction description.
-     */
-    public String getDescription() {
-        return description;
+        this.timestamp = LocalDateTime.now();
     }
 
     /**
@@ -77,6 +60,6 @@ public class Transaction {
     public String toString() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         return String.format("Transaction{Time: %s, Source: %s, Type: %s, Description: %s}",
-                getTimestamp().format(formatter), getSourceAccount(), getTransactionType(), getDescription());
+                getTimestamp().format(formatter), accountNumber, transactionType, description);
     }
 }

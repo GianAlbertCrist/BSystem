@@ -54,7 +54,7 @@ public class Main
                 //Bank Login
                 case 2:
                     showMenuHeader("Bank Operations");
-                    showMenu(Menu.BankLogin.menuIdx);
+                    showMenu(3);
                     setOption();
                     switch (getOption()) {
                         case 1 -> BankLauncher.bankLogin();

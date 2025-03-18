@@ -34,6 +34,35 @@ public abstract class Account {
         this.transactions = new ArrayList<>();
     }
 
+    //Getters
+    public String getOwnerFname() {
+        return ownerFname;
+    }
+
+    public String getOwnerLname() {
+        return ownerLname;
+    }
+
+    public String getOwnerEmail() {
+        return ownerEmail;
+    }
+
+    public String getPin() {
+        return pin;
+    }
+
+    public Bank getBank() {
+        return bank;
+    }
+
+    public String getAccountNumber() {
+        return accountNumber;
+    }
+
+    public ArrayList<Transaction> getTransactions() {
+        return new ArrayList<>(transactions);
+    }
+
     public String getOwnerFullName() {
         return String.format("%s %s",this.ownerFname, this.ownerLname);
     }
@@ -64,35 +93,6 @@ public abstract class Account {
             transactionLog.append(transaction.toString()).append("\n");
         }
         return transactionLog.toString();
-    }
-
-    //Getters
-    public String getOwnerFname() {
-        return ownerFname;
-    }
-
-    public String getOwnerLname() {
-        return ownerLname;
-    }
-
-    public String getOwnerEmail() {
-        return ownerEmail;
-    }
-
-    public String getPin() {
-        return pin;
-    }
-
-    public Bank getBank() {
-        return bank;
-    }
-
-    public String getAccountNumber() {
-        return accountNumber;
-    }
-
-    public ArrayList<Transaction> getTransactions() {
-        return new ArrayList<>(transactions);
     }
 
     @Override

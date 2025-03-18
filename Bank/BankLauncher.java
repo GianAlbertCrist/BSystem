@@ -17,12 +17,21 @@ public class BankLauncher {
     private static Bank loggedBank;
 
     /**
+     * Checks if there is a currently logged-in bank session.
+     *
+     * @return true if a bank is logged in, false otherwise.
+     */
+    public static boolean isLogged() {
+        return loggedBank != null;
+    }
+
+    /**
      * Bank interaction initialization. Utilized only when logged in.
      */
     public static void bankInit() {
         while (isLogged()) {
             Main.showMenuHeader("Banking System");
-            Main.showMenu(Menu.BankMenu.menuIdx);
+            Main.showMenu(31);
             Main.setOption();
 
             switch (Main.getOption()) {
@@ -39,22 +48,46 @@ public class BankLauncher {
     }
 
     /**
-     * Checks if there is a currently logged-in bank session.
-     *
-     * @return true if a bank is logged in, false otherwise.
+     * Show the accounts registered to this bank.
+     * Must prompt the user to select which type of accounts to show:
+     * (1) Credit Accounts, (2) Savings Accounts, (3) All, and (4) Create New Account.
      */
-    public static boolean isLogged() {
-        return loggedBank != null;
+    public static void showAccounts() {
+        if (loggedBank == null) {
+            System.out.println("No bank logged in.");
+            return;
+        }
+
+        Main.showMenuHeader("Show Accounts");
+        Main.showMenu(32);
+        Main.setOption();
+
+        switch (Main.getOption()) {
+            case 1 -> displayAccounts(CreditAccount.class);
+            case 2 -> displayAccounts(SavingsAccount.class);
+            case 3 -> displayAllAccounts();
+            default -> System.out.println("Invalid option. Try again.");
+        }
     }
 
     /**
-     * Adds a new bank to the list of registered banks.
-     *
-     * @param b The bank to be added.
+     * Handles the creation of a new account within the currently logged-in bank.
      */
-    public static void addBank(Bank b) {
-        banks.add(b);
-        System.out.println("Bank successfully added: " + b.getName());
+    public static void newAccounts() {
+        if (loggedBank == null) {
+            System.out.println("No bank logged in.");
+            return;
+        }
+
+        Main.showMenuHeader("Create a New Account");
+        Main.showMenu(33);
+        Main.setOption();
+
+        switch (Main.getOption()) {
+            case 1 -> loggedBank.createNewCreditAccount();
+            case 2 -> loggedBank.createNewSavingsAccount();
+            default -> System.out.println("Invalid choice.");
+        }
     }
 
     /**
@@ -103,6 +136,34 @@ public class BankLauncher {
         bankInit();
     }
 
+    /**
+     * Logs into a selected bank session.
+     *
+     * @param bank The bank to log into.
+     */
+    public static void setLogSession(Bank bank) {
+        loggedBank = bank;
+    }
+
+    /**
+     * Logs out from the current bank session.
+     */
+    private static void logout() {
+        if (loggedBank != null) {
+            System.out.println("Logging out from " + loggedBank.getName());
+        }
+        loggedBank = null;
+    }
+
+    /**
+     * Adds a new bank to the list of registered banks.
+     *
+     * @param b The bank to be added.
+     */
+    public static void addBank(Bank b) {
+        banks.add(b);
+        System.out.println("Bank successfully added: " + b.getName());
+    }
 
     /**
      * Output a menu of all registered or created banks in this session.
@@ -132,29 +193,6 @@ public class BankLauncher {
     }
 
     /**
-     * Show the accounts registered to this bank.
-     * Must prompt the user to select which type of accounts to show:
-     * (1) Credit Accounts, (2) Savings Accounts, (3) All, and (4) Create New Account.
-     */
-    public static void showAccounts() {
-        if (loggedBank == null) {
-            System.out.println("No bank logged in.");
-            return;
-        }
-
-        Main.showMenuHeader("Show Accounts");
-        Main.showMenu(32);
-        Main.setOption();
-
-        switch (Main.getOption()) {
-            case 1 -> displayAccounts(CreditAccount.class);
-            case 2 -> displayAccounts(SavingsAccount.class);
-            case 3 -> displayAllAccounts();
-            default -> System.out.println("Invalid option. Try again.");
-        }
-    }
-
-    /**
      * Display all accounts registered under the logged-in bank.
      */
     private static void displayAllAccounts() {
@@ -171,45 +209,6 @@ public class BankLauncher {
         loggedBank.showAccounts(accountType);
     }
 
-
-    /**
-     * Handles the creation of a new account within the currently logged-in bank.
-     */
-    public static void newAccounts() {
-        if (loggedBank == null) {
-            System.out.println("No bank logged in.");
-            return;
-        }
-
-        Main.showMenuHeader("Create a New Account");
-        Main.showMenu(Menu.AccountTypeSelection.menuIdx);
-        Main.setOption();
-
-        switch (Main.getOption()) {
-            case 1 -> loggedBank.createNewCreditAccount();
-            case 2 -> loggedBank.createNewSavingsAccount();
-            default -> System.out.println("Invalid choice.");
-        }
-    }
-
-    /**
-     * Logs into a selected bank session.
-     *
-     * @param bank The bank to log into.
-     */
-    public static void setLogSession(Bank bank) {
-        loggedBank = bank;
-    }
-
-    /**
-     * Logs out from the current bank session.
-     */
-    private static void logout() {
-        if (loggedBank != null) {
-            System.out.println("Logging out from " + loggedBank.getName());
-        }
-        loggedBank = null;
-    }
     /**
      * Creates a new bank and registers it in the system.
      */
