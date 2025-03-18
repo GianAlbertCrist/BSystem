@@ -31,6 +31,7 @@ public class Main
 
             // Account Option
             switch (getOption()) {
+                //Accounts Login
                 case 1:
                     showMenuHeader("Account Login");
                     showMenu(2);
@@ -50,7 +51,7 @@ public class Main
                         accountLauncher.accountLogin();
                     }   break;
 
-            // Create New Bank
+                //Bank Login
                 case 2:
                     showMenuHeader("Bank Operations");
                     showMenu(Menu.BankLogin.menuIdx);
@@ -61,6 +62,7 @@ public class Main
                         default -> System.out.println("Invalid bank menu option.");
                     }   break;
 
+                // Create New Bank
                 case 3:
                     showMenuHeader("Create New Bank");
                     BankLauncher.createNewBank();
