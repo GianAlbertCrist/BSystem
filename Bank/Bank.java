@@ -101,7 +101,7 @@ public class Bank {
         // Create fields with appropriate validation
         Field<String, Integer> accountNumberField = new Field<String, Integer>("Account Number", String.class, 5, new Field.StringFieldLengthValidator());
 
-        Field<String, Integer> pinField = new Field<String, Integer>("PIN", String.class, 3, new Field.StringFieldLengthValidator());
+        Field<String, Integer> pinField = new Field<String, Integer>("PIN", String.class, 4, new Field.StringFieldLengthValidator());
 
         Field<String, String> firstNameField = new Field<String, String>("First Name", String.class, null, new Field.StringFieldValidator());
 
@@ -237,14 +237,19 @@ public class Bank {
     public static class BankCredentialsComparator implements Comparator<Bank> {
         @Override
         public int compare(Bank b1, Bank b2) {
-            BankComparator name = new BankComparator();
-            int compareName = name.compare(b1, b2);
-
-            if (compareName != 0) {
-                return compareName;
+            // Compare IDs first
+            if (b1.getBankId() != b2.getBankId()) {
+                return Integer.compare(b1.getBankId(), b2.getBankId());
             }
 
-            return Integer.compare(b1.getBankId(), b2.getBankId());
+            // If IDs are the same, compare names
+            int nameComparison = b1.getName().compareTo(b2.getName());
+            if (nameComparison != 0) {
+                return nameComparison;
+            }
+
+            // If names are the same, compare passcodes
+            return b1.getPasscode().compareTo(b2.getPasscode());
         }
     }
 

@@ -53,12 +53,8 @@ public class BankLauncher {
      * @param b The bank to be added.
      */
     public static void addBank(Bank b) {
-        if (!banks.contains(b)) {
-            banks.add(b);
-            System.out.println("Bank successfully added: " + b.getName());
-        } else {
-            System.out.println("Bank already exists.");
-        }
+        banks.add(b);
+        System.out.println("Bank successfully added: " + b.getName());
     }
 
     /**
@@ -126,12 +122,12 @@ public class BankLauncher {
     /**
      * Checks if a bank exists based on some criteria.
      * 
-     * @param bankComparator – Criteria for searching.
+     * @param comparator – Criteria for searching.
      * @param bank – Bank object to be compared.
      * @return Bank object if it passes the criteria. Null if none.
      */
-    public static Bank getBank(Comparator<Bank> bankComparator, Bank bank) {
-        return banks.stream().filter(b -> bankComparator.compare(b, bank) == 0).findFirst().orElse(null);
+    public static Bank getBank(Comparator<Bank> comparator, Bank bank) {
+        return banks.stream().filter(b -> comparator.compare(b, bank) == 0).findFirst().orElse(null);
     }
 
     /**
@@ -273,8 +269,12 @@ public class BankLauncher {
         }
 
         // Add Bank to the List
-        addBank(newBank);
-        System.out.println("Bank created successfully: " + newBank);
+        if (getBank(new Bank.BankComparator(), newBank) == null) {
+            System.out.println("Bank created successfully: " + newBank);
+            addBank(newBank);
+        } else {
+            System.out.printf("Bank %s already exists!\n", newBank.getName());
+        }
     }
 
     /**
