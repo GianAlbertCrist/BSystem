@@ -225,7 +225,7 @@ public class Bank {
     @Override
     public String toString() {
         return String.format("Bank{Bank ID: %d,Bank Name: %s, Bank Passcode: %s, # of Account Registered: %d}",
-                                    bankId, bankName, passcode, bankAccounts.size());
+                                    bankId, bankName, "*".repeat(passcode.length()), bankAccounts.size());
     }
 
     //Comparators
