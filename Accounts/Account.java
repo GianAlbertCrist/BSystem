@@ -97,7 +97,7 @@ public abstract class Account {
 
     @Override
     public String toString() {
-        return String.format("Account{Owner: %s, Email: %s, Bank: %s, Account Number: %s, Transactions Count: %d}",
-                                    getOwnerFullName(), ownerEmail, bank.getName(), accountNumber, transactions.size());
+        return String.format("{Owner: %s, Email: %s, Bank: %s, Account Number: %s, Transactions Count: %d}",
+                            getOwnerFullName(), ownerEmail, bank.getName(), accountNumber, transactions.size());
     }
 }

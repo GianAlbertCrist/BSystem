@@ -99,6 +99,7 @@ public class BankLauncher {
         // Set logged-in session
         setLogSession(selectedBank);
         System.out.println("Successfully logged into " + loggedBank.getName());
+        System.out.println(loggedBank);
         bankInit();
     }
 
@@ -185,8 +186,8 @@ public class BankLauncher {
         Main.setOption();
 
         switch (Main.getOption()) {
-            case 1 -> System.out.println("Credit Account created: " + loggedBank.createNewCreditAccount());
-            case 2 -> System.out.println("Savings Account created: " + loggedBank.createNewSavingsAccount());
+            case 1 -> loggedBank.createNewCreditAccount();
+            case 2 -> loggedBank.createNewSavingsAccount();
             default -> System.out.println("Invalid choice.");
         }
     }

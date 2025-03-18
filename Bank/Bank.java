@@ -171,6 +171,7 @@ public class Bank {
             return;
         }
         bankAccounts.add(account);
+        System.out.println(account);
         System.out.println("Account successfully registered.");
     }
 

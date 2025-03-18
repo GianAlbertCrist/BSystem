@@ -196,6 +196,9 @@ public class SavingsAccount extends Account implements Withdrawal, Deposit, Fund
         return true;
     }
 
+    public String toString (){
+        return "Savings Account " + super.toString();
+    }
     public double getAccountBalance() {
         return this.balance;
     }
