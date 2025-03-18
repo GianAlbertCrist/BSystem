@@ -67,11 +67,10 @@ public class CreditAccount extends Account implements Payment, Recompense {
      *
      * @param account Target account to pay money into.
      * @return True if pay transaction was successful, false otherwise
-     * @throws IllegalAccountType Credit Accounts cannot pay to other Credit Accounts
      */
     @Override
     public boolean pay(Account account, double amount) {
-        if (!(account instanceof SavingsAccount)) {
+        if (!(account instanceof SavingsAccount savingsAccount)) {
             throw new IllegalArgumentException("Credit Accounts can only pay to Savings Accounts.");
         }
 
@@ -85,14 +84,13 @@ public class CreditAccount extends Account implements Payment, Recompense {
         adjustLoanAmount(amount);
 
         // Add the paid amount to the recipient's balance
-        SavingsAccount savingsAccount = (SavingsAccount) account;
         savingsAccount.adjustAccountBalance(amount);
 
         // Log the transaction for both accounts
-        addNewTransaction(account.getAccountNumber(), Transaction.Transactions.PAYMENT,
+        addNewTransaction(account.getAccountNumber(), Transaction.Transactions.Payment,
                 String.format("Paid Php %.2f to %s", amount, account.getAccountNumber()));
 
-        savingsAccount.addNewTransaction(this.accountNumber, Transaction.Transactions.RECEIVE_TRANSFER,
+        savingsAccount.addNewTransaction(this.accountNumber, Transaction.Transactions.ReceiveTransfer,
                 String.format("Received Php %.2f from Credit Account %s", amount, this.accountNumber));
 
         System.out.println("Payment successful. New loan balance: Php" + this.loanBalance);

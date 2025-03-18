@@ -62,7 +62,7 @@ public class BankLauncher {
     }
 
     /**
-     * Bank interaction when attempting to login to the banking module using a bank user's credentials.
+     * Bank interaction when attempting to log in to the banking module using a bank user's credentials.
      */
     public static void bankLogin() {
         if (banks.isEmpty()) {

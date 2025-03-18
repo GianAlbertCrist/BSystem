@@ -17,7 +17,7 @@ public class Bank {
     /**
      * depositLimit - The amount of money each Savings Account registered to this bank can deposit at every
      * transaction. Defaults to 50,000.0
-     * withdrawLimit - The amount of money withdrawable / transferrable at once, restricted to every Savings Account
+     * withdrawLimit - The amount of money withdrawal / transferable at once, restricted to every Savings Account
      * registered to this bank. Defaults to 50,000.0
      * creditLimit - Limits the amount of credit or loan that all Credit Accounts, registered on this bank, can handle all
      * at once. Defaults to 100,000.
@@ -78,7 +78,6 @@ public class Bank {
 
     /**
      * Get the Account object (if it exists) from a given bank.
-     * @param bank - Bank to search from.
      * @param accountNum – Account number of target account.
      * @return The account associated with the provided account number, or null if no such account exists.
      */

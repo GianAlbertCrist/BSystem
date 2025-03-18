@@ -89,7 +89,7 @@ public class SavingsAccount extends Account implements Withdrawal, Deposit, Fund
         this.adjustAccountBalance(amount);
 
         // Ensure a transaction log is added for the deposit
-        this.addNewTransaction(this.getAccountNumber(), Transaction.Transactions.DEPOSIT,
+        this.addNewTransaction(this.getAccountNumber(), Transaction.Transactions.Deposit,
                 "Deposited Php " + amount);
 
         return true;
@@ -110,7 +110,7 @@ public class SavingsAccount extends Account implements Withdrawal, Deposit, Fund
 
         // Adjust balance and log transaction
         adjustAccountBalance(-amount);
-        addNewTransaction(accountNumber, Transaction.Transactions.WITHDRAWAL,
+        addNewTransaction(accountNumber, Transaction.Transactions.Withdraw,
                 String.format("Withdraw Php %.2f", amount));
 
         return true;
@@ -123,8 +123,8 @@ public class SavingsAccount extends Account implements Withdrawal, Deposit, Fund
      * Cannot proceed if one of the following is true:
      * <ul>
      *     <li>Insufficient balance from source account.</li>
-     *     <li>Recepient account does not exist.</li>
-     *     <li>Recepient account is from another bank.</li>
+     *     <li>Recipient account does not exist.</li>
+     *     <li>Recipient account is from another bank.</li>
      * </ul>
      * @param account – Account number of recipient
      * @param amount – Amount of money to be supposedly adjusted from this account’s balance.
@@ -133,8 +133,8 @@ public class SavingsAccount extends Account implements Withdrawal, Deposit, Fund
      * @return Flag if fund transfer transaction is successful or not.
      */
     @Override
-    public boolean transfer(Account recipient, double amount) throws IllegalAccountType {
-        if (!(recipient instanceof SavingsAccount)) {
+    public boolean transfer(Account account, double amount) throws IllegalAccountType {
+        if (!(account instanceof SavingsAccount)) {
             throw new IllegalAccountType("Cannot transfer funds to a CreditAccount.");
         }
 
@@ -145,12 +145,12 @@ public class SavingsAccount extends Account implements Withdrawal, Deposit, Fund
 
         // Deduct from sender and add to recipient
         adjustAccountBalance(-amount);
-        ((SavingsAccount) recipient).adjustAccountBalance(amount);
+        ((SavingsAccount) account).adjustAccountBalance(amount);
 
         // Log transactions for both accounts
-        addNewTransaction(recipient.getAccountNumber(), Transaction.Transactions.FUNDTRANSFER,
-                String.format("Transferred Php %.2f to %s", amount, recipient.getAccountNumber()));
-        recipient.addNewTransaction(accountNumber, Transaction.Transactions.RECEIVE_TRANSFER,
+        addNewTransaction(account.getAccountNumber(), Transaction.Transactions.FundTransfer,
+                String.format("Transferred Php %.2f to %s", amount, account.getAccountNumber()));
+        account.addNewTransaction(accountNumber, Transaction.Transactions.ReceiveTransfer,
                 String.format("Received Php %.2f from %s", amount, accountNumber));
 
         return true;
@@ -167,14 +167,14 @@ public class SavingsAccount extends Account implements Withdrawal, Deposit, Fund
      * @throws IllegalAccountType Cannot fund transfer when the other account is of type CreditAccount
      */
     @Override
-    public boolean transfer(Bank recipientBank, Account recipient, double amount) throws IllegalAccountType {
-        if (!(recipient instanceof SavingsAccount)) {
+    public boolean transfer(Bank bank, Account account, double amount) throws IllegalAccountType {
+        if (!(account instanceof SavingsAccount)) {
             throw new IllegalAccountType("Cannot transfer funds to a CreditAccount.");
         }
 
-        double totalAmount = amount + bank.getProcessingFee();
+        double totalAmount = amount + this.bank.getProcessingFee();
 
-        if (!hasEnoughBalance(totalAmount) || amount <= 0 || totalAmount > bank.getWithdrawLimit()) {
+        if (!hasEnoughBalance(totalAmount) || amount <= 0 || totalAmount > this.bank.getWithdrawLimit()) {
             insufficientBalance();
             return false; // Insufficient funds or exceeding withdrawal limit
         }
@@ -183,15 +183,15 @@ public class SavingsAccount extends Account implements Withdrawal, Deposit, Fund
         adjustAccountBalance(-totalAmount);
 
         // Credit only the transferred amount (not including fee) to recipient
-        ((SavingsAccount) recipient).adjustAccountBalance(amount);
+        ((SavingsAccount) account).adjustAccountBalance(amount);
 
         // Log transactions for both accounts
-        addNewTransaction(recipient.getAccountNumber(), Transaction.Transactions.EXTERNAL_TRANSFER,
+        addNewTransaction(account.getAccountNumber(), Transaction.Transactions.ExternalTransfer,
                 String.format("Transferred Php %.2f to %s at %s (Fee: Php %.2f)", 
-                                    amount, recipient.getAccountNumber(), recipientBank.getName(), bank.getProcessingFee()));
+                                    amount, account.getAccountNumber(), bank.getName(), this.bank.getProcessingFee()));
 
-        recipient.addNewTransaction(accountNumber, Transaction.Transactions.RECEIVE_TRANSFER,
-                String.format("Received Php %.2f from %s at %s", amount, this.accountNumber, bank.getName()));
+        account.addNewTransaction(accountNumber, Transaction.Transactions.ReceiveTransfer,
+                String.format("Received Php %.2f from %s at %s", amount, this.accountNumber, this.bank.getName()));
 
         return true;
     }

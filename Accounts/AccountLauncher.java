@@ -10,7 +10,7 @@ import Main.*;
 public class AccountLauncher {
     //Account object of logged account user.
     private static Account loggedAccount;
-    //Selected associated bank when attempting to login in the account module.
+    //Selected associated bank when attempting to log in in the account module.
     private static Bank assocBank;
 
     public void setAssocBank(Bank assocBank) {
@@ -95,7 +95,7 @@ public class AccountLauncher {
     }
 
     /**
-     * Bank selection screen before the user is prompted to login. User is prompted for the Bank ID
+     * Bank selection screen before the user is prompted to log in. User is prompted for the Bank ID
      * with corresponding bank name.
      *
      * @return Bank object based on selected ID.
@@ -117,9 +117,9 @@ public class AccountLauncher {
     /**
      * Checks inputted credentials during account login.
      *
-     * @param accountNum Account number.
+     * @param accountNumber Account number.
      * @param pin 4-digit pin.
-     * @return Account object if it passes verification, null if not.
+     * @return Account object if it passes verification.
      */
     private boolean checkCredentials(String accountNumber, String pin) {
         Account account = assocBank.getBankAccount(accountNumber);
@@ -132,7 +132,7 @@ public class AccountLauncher {
      * @param account – Account that has successfully logged in.
      */
     public void setLogSession(Account account) {
-        this.loggedAccount = account;
+        loggedAccount = account;
     }
 
     /**

@@ -11,27 +11,20 @@ public class Transaction {
 
     // Enum for transaction types
     public enum Transactions {
-        DEPOSIT,
-        WITHDRAWAL,
-        FUNDTRANSFER,
-        RECEIVE_TRANSFER,
-        EXTERNAL_TRANSFER,
-        PAYMENT,
-        COMPENSATION
+        Deposit,
+        Withdraw,
+        FundTransfer,
+        ReceiveTransfer,
+        ExternalTransfer,
+        Payment,
+        Recompense
     }
 
-    private final String sourceAccount; // The account that initiated the transaction
-    private final Transactions transactionType; // The type of transaction
-    private final String description; // Description of the transaction
-    private final LocalDateTime timestamp; // Timestamp of when the transaction occurred
+    private final String sourceAccount;
+    private final Transactions transactionType;
+    private final String description;
+    private final LocalDateTime timestamp;
 
-    /**
-     * Constructor for Transaction.
-     *
-     * @param sourceAccount The account number initiating the transaction.
-     * @param transactionType The type of transaction.
-     * @param description A brief description of the transaction.
-     */
     public Transaction(String sourceAccount, Transactions transactionType, String description) {
         this.sourceAccount = sourceAccount;
         this.transactionType = transactionType;
@@ -83,11 +76,7 @@ public class Transaction {
     @Override
     public String toString() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        return "Transaction{" +
-                "Time=" + getTimestamp().format(formatter) +
-                ", Source='" + getSourceAccount() + '\'' +
-                ", Type=" + getTransactionType() +
-                ", Description='" + getDescription() + '\'' +
-                '}';
+        return String.format("Transaction{Time: %s, Source: %s, Type: %s, Description: %s}",
+                getTimestamp().format(formatter), getSourceAccount(), getTransactionType(), getDescription());
     }
 }
