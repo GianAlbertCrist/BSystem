@@ -5,15 +5,15 @@ import Bank.Bank;
 import Main.*;
 
 /**
- * SavingsAccountLauncher handles user interactions for Savings Accounts,
- * allowing deposits, withdrawals, and fund transfers.
+ * Savings Account Launcher class for handling savings account operations
  */
 public class SavingsAccountLauncher {
 
     private static SavingsAccount loggedAccount;
 
     /**
-     * Initializes the Savings Account menu after login.
+     * Method that deals with all things about savings accounts.
+     * Mainly utilized for showing the main menu after Savings Account users log in to the application.
      */
     public static void savingsAccountInit() throws IllegalAccountType {
         if (loggedAccount == null) {
@@ -41,7 +41,7 @@ public class SavingsAccountLauncher {
     }
 
     /**
-     * Handles the deposit process.
+     * A method that deals with the deposit process transaction.
      */
     public static void depositProcess() {
         Field<Double, Double> amountField = new Field<Double, Double>("Deposit Amount", Double.class, 1.0, new Field.DoubleFieldValidator());
@@ -56,7 +56,7 @@ public class SavingsAccountLauncher {
     }
 
     /**
-     * Handles the withdrawal process.
+     * A method that deals with the withdrawal process transaction.
      */
     public static void withdrawProcess() {
         Field<Double, Double> amountField = new Field<Double, Double>("Withdrawal Amount", Double.class, 1.0, new Field.DoubleFieldValidator());
@@ -70,6 +70,9 @@ public class SavingsAccountLauncher {
         }
     }
 
+    /**
+     * A method that deals with the fund transfer process transaction.
+     */
     public static void fundTransfer() throws IllegalAccountType {
         if (loggedAccount == null) {
             System.out.println("No account logged in.");
@@ -107,8 +110,8 @@ public class SavingsAccountLauncher {
                 System.out.println("Transfer failed. Insufficient funds or limit exceeded.");
             }
 
-
-        } else if (transferType == 2) { // External Transfer
+         // External Transfer
+        } else if (transferType == 2) {
             // Get recipient Bank ID instead of name
             Field<Integer, Integer> recipientBankField = new Field<Integer, Integer>("Recipient Bank ID", Integer.class, 1, new Field.IntegerFieldValidator());
             recipientBankField.setFieldValue("Enter recipient bank ID: ");
@@ -157,7 +160,7 @@ public class SavingsAccountLauncher {
     }
 
     /**
-     * Gets the currently logged-in Savings Account.
+     * Get the Savings Account instance of the currently logged account.
      *
      * @return The logged-in SavingsAccount.
      */

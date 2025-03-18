@@ -5,19 +5,26 @@ import Bank.Bank;
 import Main.*;
 
 /**
- * AccountLauncher handles user login and navigation to account-specific menus.
+ * A class primarily used for interacting with the account module.
  */
 public class AccountLauncher {
-
-    private Account loggedAccount;
-    private Bank assocBank;
+    //Account object of logged account user.
+    private static Account loggedAccount;
+    //Selected associated bank when attempting to login in the account module.
+    private static Bank assocBank;
 
     public void setAssocBank(Bank assocBank) {
-        this.assocBank = assocBank;
+        AccountLauncher.assocBank = assocBank;
+    }
+
+    //Getters
+    public static Account getLoggedAccount() {
+        return loggedAccount;
     }
 
     /**
-     * Initializes the account login process.
+     * Login an account. Bank must be selected first before logging in. Account existence will depend
+     * on the selected bank.
      */
     public void accountLogin() throws IllegalAccountType {
         if (assocBank == null) {
@@ -88,9 +95,10 @@ public class AccountLauncher {
     }
 
     /**
-     * Allows the user to select a bank before logging into an account.
+     * Bank selection screen before the user is prompted to login. User is prompted for the Bank ID
+     * with corresponding bank name.
      *
-     * @return The selected Bank instance.
+     * @return Bank object based on selected ID.
      */
     public static Bank selectBank() {
         if (BankLauncher.bankSize() == 0) {
@@ -107,11 +115,11 @@ public class AccountLauncher {
     }
 
     /**
-     * Validates the login credentials.
+     * Checks inputted credentials during account login.
      *
-     * @param accountNumber The account number being verified.
-     * @param pin           The entered PIN.
-     * @return True if the credentials match, false otherwise.
+     * @param accountNum Account number.
+     * @param pin 4-digit pin.
+     * @return Account object if it passes verification, null if not.
      */
     private boolean checkCredentials(String accountNumber, String pin) {
         Account account = assocBank.getBankAccount(accountNumber);
@@ -119,16 +127,16 @@ public class AccountLauncher {
     }
 
     /**
-     * Creates a session for the logged-in account.
+     * Create a login session based on the logged user account.
      *
-     * @param account The account that successfully logged in.
+     * @param account – Account that has successfully logged in.
      */
     public void setLogSession(Account account) {
         this.loggedAccount = account;
     }
 
     /**
-     * Destroys the current account session.
+     * Destroy the log session of the previously logged user account.
      */
     public void destroyLogSession() {
         System.out.println("Logging out of " + loggedAccount.getAccountNumber());
@@ -136,9 +144,9 @@ public class AccountLauncher {
     }
 
     /**
-     * Checks if an account is currently logged in.
+     * Verifies if some account is currently logged in.
      *
-     * @return True if an account is logged in, false otherwise.
+     * @return true if an account is logged in, false otherwise
      */
     public boolean isLoggedIn() {
         return loggedAccount != null;

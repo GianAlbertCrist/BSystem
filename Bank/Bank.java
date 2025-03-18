@@ -14,11 +14,19 @@ import java.util.Comparator;
 public class Bank {
     private String bankName, passcode;
     private final int bankId;
-    private final ArrayList<Account> bankAccounts;
-
-    // Banking Limits
+    /**
+     * depositLimit - The amount of money each Savings Account registered to this bank can deposit at every
+     * transaction. Defaults to 50,000.0
+     * withdrawLimit - The amount of money withdrawable / transferrable at once, restricted to every Savings Account
+     * registered to this bank. Defaults to 50,000.0
+     * creditLimit - Limits the amount of credit or loan that all Credit Accounts, registered on this bank, can handle all
+     * at once. Defaults to 100,000.
+     */
     private final double depositLimit, withdrawLimit, creditLimit;
+    //Processing fee added when some transaction is involved with another bank. Cannot be lower
+    //than 0.0. Defaults to 10.00
     private final double processingFee;
+    private final ArrayList<Account> bankAccounts;
 
     /**
      * Constructor for Bank.
@@ -30,27 +38,28 @@ public class Bank {
         this.bankId = bankId;
         this.bankName = bankName;
         this.passcode = passcode;
-        this.bankAccounts = new ArrayList<>();
-
-        // Default banking limits
         this.depositLimit = 50000.0;
         this.withdrawLimit = 50000.0;
         this.creditLimit = 100000.0;
         this.processingFee = 10.0;
+        this.bankAccounts = new ArrayList<>();
     }
 
     public Bank(int bankId, String bankName, String passcode, double depositLimit, double withdrawLimit, double creditLimit, double processingFee) {
         this.bankId = bankId;
         this.bankName = bankName;
         this.passcode = passcode;
-        this.bankAccounts = new ArrayList<>();
-
         this.depositLimit = depositLimit;
         this.withdrawLimit = withdrawLimit;
         this.creditLimit = creditLimit;
         this.processingFee = processingFee;
+        this.bankAccounts = new ArrayList<>();
     }
 
+    /**
+     * Show accounts based on option.
+     * @param accountType – Type of account to be shown.
+     */
     public <T extends Account> void showAccounts(Class<T> accountType) {
         if (accountType == null) {
             for (Account account : bankAccounts) {
@@ -68,13 +77,13 @@ public class Bank {
     }
 
     /**
-     * Retrieves an account from this bank using an account number.
-     *
-     * @param accountNum The account number to search for.
-     * @return The account if found, otherwise null.
+     * Get the Account object (if it exists) from a given bank.
+     * @param bank - Bank to search from.
+     * @param accountNum – Account number of target account.
+     * @return The account associated with the provided account number, or null if no such account exists.
      */
     public Account getBankAccount(String accountNum) {
-        for (Account account : bankAccounts) { // Assuming `accounts` is a list of accounts
+        for (Account account : bankAccounts) {
             if (account.getAccountNumber().equals(accountNum)) {
                 return account;
             }
@@ -83,9 +92,9 @@ public class Bank {
     }
 
     /**
-     * Creates a new account with validated input fields.
-     *
-     * @return A list of Field objects containing account details.
+     * Handles the processing of inputting the basic information of the account.
+     * 
+     * @return Array list of Field objects, which are the basic account information of the account user.
      */
     public ArrayList<Field<?, ?>> createNewAccount() {
         ArrayList<Field<?, ?>> accountFields = new ArrayList<>();
@@ -114,9 +123,9 @@ public class Bank {
     }
 
     /**
-     * Creates and registers a new SavingsAccount using validated fields.
-     *
-     * @return The newly created SavingsAccount.
+     * Create a new savings account. Utilizes the createNewAccount() method.
+     * 
+     * @return New savings account
      */
     public SavingsAccount createNewSavingsAccount() {
         ArrayList<Field<?, ?>> accountData = createNewAccount();
@@ -135,9 +144,9 @@ public class Bank {
     }
 
     /**
-     * Creates and registers a new CreditAccount using validated fields.
-     *
-     * @return The newly created CreditAccount.
+     * Create a new credit account. Utilizes the createNewAccount() method.
+     * 
+     * @return New credit account.
      */
     public CreditAccount createNewCreditAccount() {
         ArrayList<Field<?, ?>> accountData = createNewAccount();
@@ -153,9 +162,9 @@ public class Bank {
     }
 
     /**
-     * Adds a new account to the bank if the account number is unique.
-     *
-     * @param account The account to add.
+     * Adds a new account to this bank, if the account number of the new account does not exist inside
+     * the bank.
+     * @param account – Account object to be added into this bank.
      */
     public void addNewAccount(Account account) {
         if (accountExists(this, account.getAccountNumber())) { // Only check within the same bank
@@ -167,12 +176,11 @@ public class Bank {
     }
 
     /**
-     * Checks if an account exists in the given bank based on an account number.
-     * This method is static because it does not require an instance of the Bank class.
-     *
-     * @param bank        The bank to search for the account.
-     * @param accountNum  The account number to check.
-     * @return true if the account exists, false otherwise.
+     * Checks if an account object exists into a given bank based on some account number.
+     * 
+     * @param bank – Bank to check if account exists.
+     * @param accountNum – Account number of target account to check.
+     * @return true if an account with the specified account number exists, false otherwise
      */
     public static boolean accountExists(Bank bank, String accountNum) {
         if (bank == null || bank.getBankAccounts() == null) {
@@ -224,6 +232,9 @@ public class Bank {
                                     bankId, bankName, passcode, bankAccounts.size());
     }
 
+    /**
+     * A comparator that compares if two bank objects are the same.
+     */
     public static class BankCredentialsComparator implements Comparator<Bank> {
         @Override
         public int compare(Bank b1, Bank b2) {
@@ -238,6 +249,9 @@ public class Bank {
         }
     }
 
+    /**
+     * A comparator that compares if two bank objects have the same bank id.
+     */
     public static class BankIdComparator implements Comparator<Bank> {
         @Override
         public int compare(Bank b1, Bank b2) {
@@ -245,6 +259,9 @@ public class Bank {
         }
     }
 
+    /**
+     * A comparator that compares if two bank objects are the same.
+     */
     public static class BankComparator implements Comparator<Bank> {
         @Override
         public int compare(Bank b1, Bank b2) {

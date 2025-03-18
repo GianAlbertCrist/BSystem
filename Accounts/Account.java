@@ -4,27 +4,25 @@ import Bank.Bank;
 import java.util.ArrayList;
 
 /**
- * Abstract Account class that serves as a base for different account types.
- * It includes personal details, basic account attributes, comparators, and transaction logging.
+ * An abstract account class that has comparators to compare itself with different account objects.
  */
 public abstract class Account {
-
+    //A constant bank object associated to this account.
     protected final Bank bank;
-    protected final String accountNumber;
-    protected final ArrayList<Transaction> transactions;
-    protected final String ownerFname, ownerLname, ownerEmail;
-    protected final String pin;
-
+    //accountNumber - Account number of this account object. Cannot be modified once set.
+    protected final String accountNumber, ownerFname, ownerLname, ownerEmail;
+    protected String pin;
     /**
-     * Constructor for an Account.
-     *
-     * @param bank          The bank associated with this account.
-     * @param accountNumber The unique account number.
-     * @param ownerFname    Owner's first name.
-     * @param ownerLname    Owner's last name.
-     * @param ownerEmail         Owner's email address.
-     * @param pin           Security PIN (in real-world, store hashed PINs).
+     * Transactions refer to the transaction logs recorded in this account.
+     * A transaction is logged based on the following:
+     * 1. A successful withdrawal.
+     * 2. A successful deposit.
+     * 3. A successful payment.
+     * 4. A successful fund transfer.
      */
+    protected final ArrayList<Transaction> transactions;
+
+    //Constructor
     public Account(Bank bank, String accountNumber, String pin, String ownerFname,
                    String ownerLname, String ownerEmail) {
         this.bank = bank;
@@ -41,18 +39,18 @@ public abstract class Account {
     }
 
     /**
-     * Adds a new transaction log to this account.
-     *
-     * @param sourceAccount The source account number that triggered this transaction.
-     * @param type          The type of transaction performed.
-     * @param description   A brief description of the transaction.
+     * Add a new transaction log to this account.
+     * 
+     * @param accountNum – Account number of source account that triggered this transaction
+     * @param type – Type of transaction triggered.
+     * @param description – Description of the transaction.
      */
-    public void addNewTransaction(String sourceAccount, Transaction.Transactions type, String description) {
-        transactions.add(new Transaction(sourceAccount, type, description));
+    public void addNewTransaction(String accountNum, Transaction.Transactions type, String description) {
+        transactions.add(new Transaction(accountNum, type, description));
     }
 
     /**
-     * Retrieves all transaction logs recorded for this account.
+     * Get all information for every transaction that has been logged into this account.
      *
      * @return A formatted string containing all transaction details.
      */
@@ -97,11 +95,6 @@ public abstract class Account {
         return new ArrayList<>(transactions);
     }
 
-    /**
-     * Provides a string representation of the account details.
-     *
-     * @return Formatted account details.
-     */
     @Override
     public String toString() {
         return String.format("Account{Owner: %s, Email: %s, Bank: %s, Account Number: %s, Transactions Count: %d}",

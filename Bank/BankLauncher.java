@@ -8,16 +8,16 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * BankLauncher handles interactions with the bank module, allowing login,
- * account management, and bank creation.
+ *A class primarily used for interacting with the bank module
  */
 public class BankLauncher {
-
+    //List of banks currently registered in this session.
     private final static ArrayList<Bank> banks = new ArrayList<>();
+    //The Bank object currently logged in. Null by default, or when no bank is currently logged in.
     private static Bank loggedBank;
 
     /**
-     * Initializes the banking module, allowing users to log in or create a new bank.
+     * Bank interaction initialization. Utilized only when logged in.
      */
     public static void bankInit() {
         while (isLogged()) {
@@ -62,7 +62,7 @@ public class BankLauncher {
     }
 
     /**
-     * Handles the bank login process.
+     * Bank interaction when attempting to login to the banking module using a bank user's credentials.
      */
     public static void bankLogin() {
         if (banks.isEmpty()) {
@@ -108,7 +108,7 @@ public class BankLauncher {
 
 
     /**
-     * Displays a menu of all registered banks.
+     * Output a menu of all registered or created banks in this session.
      */
     public static void showBanksMenu() {
         if (banks.isEmpty()) {
@@ -124,11 +124,11 @@ public class BankLauncher {
     }
 
     /**
-     * Retrieves a bank that matches the given comparator.
-     *
-     * @param bankComparator Comparator to determine the matching criteria.
-     * @param bank Bank object to be compared.
-     * @return The matching Bank object, or null if no match is found.
+     * Checks if a bank exists based on some criteria.
+     * 
+     * @param bankComparator – Criteria for searching.
+     * @param bank – Bank object to be compared.
+     * @return Bank object if it passes the criteria. Null if none.
      */
     public static Bank getBank(Comparator<Bank> bankComparator, Bank bank) {
         return banks.stream().filter(b -> bankComparator.compare(b, bank) == 0).findFirst().orElse(null);
@@ -146,7 +146,7 @@ public class BankLauncher {
         }
 
         Main.showMenuHeader("Show Accounts");
-        Main.showMenu(Menu.ShowAccounts.menuIdx);
+        Main.showMenu(32);
         Main.setOption();
 
         switch (Main.getOption()) {

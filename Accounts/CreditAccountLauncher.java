@@ -4,15 +4,15 @@ import Bank.*;
 import Main.*;
 
 /**
- * CreditAccountLauncher handles user interactions for Credit Accounts,
- * allowing credit payments and recompense.
+ * Credit Account Launcher class for handling credit account operations.
  */
 public class CreditAccountLauncher {
 
     private static CreditAccount loggedAccount;
 
     /**
-     * Initializes the Credit Account menu after login.
+     * Method that deals with all things about credit accounts. Mainly utilized for showing the main
+     * menu after Credit Account users log in to the application.
      */
     public static void creditAccountInit() {
         if (loggedAccount == null) {
@@ -39,7 +39,7 @@ public class CreditAccountLauncher {
     }
 
     /**
-     * Handles the credit payment process.
+     * Method that is utilized to process the credit payment transaction.
      */
     public static void creditPaymentProcess() {
         Field<String, Integer> recipientField = new Field<String, Integer>("Recipient Account Number", String.class, 5, new Field.StringFieldLengthValidator());
@@ -68,7 +68,7 @@ public class CreditAccountLauncher {
     }
 
     /**
-     * Handles the credit recompense process.
+     * Method that is utilized to process the credit compensation transaction.
      */
     public static void creditRecompenseProcess() {
         Field<Double, Double> amountField = new Field<Double, Double>("Recompense Amount", Double.class, 1.0, new Field.DoubleFieldValidator());
@@ -84,19 +84,19 @@ public class CreditAccountLauncher {
     }
 
     /**
+     * Get the Credit Account instance of the currently logged account.
+     * @return The currently logged account
+     */
+    public static CreditAccount getLoggedAccount() {
+        return loggedAccount;
+    }
+
+    /**
      * Sets the currently logged-in Credit Account.
      *
      * @param account The logged-in CreditAccount.
      */
     public static void setLoggedAccount(CreditAccount account) {
         loggedAccount = account;
-    }
-
-    /**
-     * Get the Credit Account instance of the currently logged account.
-     * @return The currently logged account
-     */
-    public static CreditAccount getLoggedAccount() {
-        return loggedAccount;
     }
 }

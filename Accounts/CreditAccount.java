@@ -8,28 +8,28 @@ import Bank.Bank;
  */
 public class CreditAccount extends Account implements Payment, Recompense {
 
-    private double loanBalance;  // The current outstanding loan
+    private double loanBalance;
 
     /**
      * Constructor for CreditAccount.
      *
-     * @param bank        The bank associated with this credit account.
-     * @param accountNumber The unique account number.
-     * @param ownerFname Owner's first name.
-     * @param ownerLname Owner's last name.
-     * @param ownerEmail       Owner's email address.
-     * @param pin         Security PIN for authentication.
+     * @param bank - The bank associated with this credit account.
+     * @param accountNumber - The unique account number.
+     * @param ownerFname - Owner's first name.
+     * @param ownerLname - Owner's last name.
+     * @param ownerEmail - Owner's email address.
+     * @param pin - Security PIN for authentication.
      */
     public CreditAccount(Bank bank, String accountNumber, String pin, String ownerFname,
                          String ownerLname, String ownerEmail) {
         super(bank, accountNumber, pin, ownerFname, ownerLname, ownerEmail);
-        this.loanBalance = 0.0; // Start with no credit used
+        this.loanBalance = 0.0;
     }
 
     /**
-     * Gets the current loan statement.
-     *
-     * @return Formatted loan statement.
+     * Loan statement of this credit account.
+     * 
+     * @return String loan statement.
      */
     public String getLoanStatement() {
         return String.format("CreditAccount{Account Number: %s, Owner: %s, Loan Balance: Php %.2f}",
@@ -37,41 +37,41 @@ public class CreditAccount extends Account implements Payment, Recompense {
     }
 
     /**
-     * Checks if the account can take additional credit without exceeding the bank's limit.
+     * Checks if this credit account can do additional credit transactions if the amount to credit will not
+     * exceed the credit limit set by the bank associated to this Credit Account.
      *
-     * @param amountAdjustment The amount to be credited.
-     * @return True if the credit transaction can proceed, otherwise false.
+     * @param amountAdjustment – The amount of credit to be adjusted once the said transaction is
+     * processed.
+     * @return Flag if this account can continue with the credit transaction.
      */
     public boolean canCredit(double amountAdjustment) {
-        double creditLimit = bank.getCreditLimit(); // Retrieve credit limit from the bank
-        return (loanBalance + amountAdjustment) <= creditLimit;
+        return (loanBalance + amountAdjustment) <= bank.getCreditLimit();
     }
 
+ 
     /**
-     * Adjusts the loan balance of the credit account.
+     * Adjust the owner’s current loan. Result of adjustment cannot be less than 0.
      *
-     * @param amountAdjustment The amount to adjust.
-     *                         - Positive values increase the loan balance (credit usage).
-     *                         - Negative values decrease the loan balance (repayment).
+     * @param amountAdjustment Amount to be adjusted to the loan of this credit account.
      */
     public void adjustLoanAmount(double amountAdjustment) {
         this.loanBalance += amountAdjustment;
         if (this.loanBalance < 0) {
-            this.loanBalance = 0; // Ensure loan balance never goes negative
+            this.loanBalance = 0.0;
         }
     }
 
     /**
-     * Pays a certain amount to a SavingsAccount.
-     * CreditAccount **cannot pay another CreditAccount**.
+     * Pay an amount of money to a selected account. Such an account cannot be of type
+     * CreditAccount.
      *
-     * @param recipient The target account to pay into.
-     * @param amount    The amount to pay.
-     * @return True if the payment was successful, false otherwise.
-     * @throws IllegalArgumentException If trying to pay to another CreditAccount.
+     * @param account Target account to pay money into.
+     * @return True if pay transaction was successful, false otherwise
+     * @throws IllegalAccountType Credit Accounts cannot pay to other Credit Accounts
      */
-    public boolean pay(Account recipient, double amount) {
-        if (!(recipient instanceof SavingsAccount)) {
+    @Override
+    public boolean pay(Account account, double amount) {
+        if (!(account instanceof SavingsAccount)) {
             throw new IllegalArgumentException("Credit Accounts can only pay to Savings Accounts.");
         }
 
@@ -85,14 +85,14 @@ public class CreditAccount extends Account implements Payment, Recompense {
         adjustLoanAmount(amount);
 
         // Add the paid amount to the recipient's balance
-        SavingsAccount savingsRecipient = (SavingsAccount) recipient;
-        savingsRecipient.adjustAccountBalance(amount);
+        SavingsAccount savingsAccount = (SavingsAccount) account;
+        savingsAccount.adjustAccountBalance(amount);
 
         // Log the transaction for both accounts
-        addNewTransaction(recipient.getAccountNumber(), Transaction.Transactions.PAYMENT,
-                String.format("Paid Php %.2f to %s", amount, recipient.getAccountNumber()));
+        addNewTransaction(account.getAccountNumber(), Transaction.Transactions.PAYMENT,
+                String.format("Paid Php %.2f to %s", amount, account.getAccountNumber()));
 
-        savingsRecipient.addNewTransaction(this.accountNumber, Transaction.Transactions.RECEIVE_TRANSFER,
+        savingsAccount.addNewTransaction(this.accountNumber, Transaction.Transactions.RECEIVE_TRANSFER,
                 String.format("Received Php %.2f from Credit Account %s", amount, this.accountNumber));
 
         System.out.println("Payment successful. New loan balance: Php" + this.loanBalance);
@@ -100,10 +100,11 @@ public class CreditAccount extends Account implements Payment, Recompense {
     }
 
     /**
-     * Recompense the bank by reducing the recorded loan balance.
+     * Recompense some amount of money to the bank and reduce the value of loan recorded in this
+     * account. Must not be greater than the current credit.
      *
-     * @param amount The amount to recompense.
-     * @return True if successful, false otherwise.
+     * @param amount Amount of money to be recompensed.
+     * @return Flag if compensation was successful.
      */
     @Override
     public boolean recompense(double amount) {

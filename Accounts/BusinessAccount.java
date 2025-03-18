@@ -48,13 +48,13 @@ public class BusinessAccount extends CreditAccount {
     /**
      * Makes a business payment to a savings account.
      *
-     * @param recipient The recipient account.
+     * @param account The recipient account.
      * @param amount    The amount to pay.
      * @return True if successful, false otherwise.
      */
     @Override
-    public boolean pay(Account recipient, double amount) {
-        if (!(recipient instanceof SavingsAccount savingsRecipient)) {
+    public boolean pay(Account account, double amount) {
+        if (!(account instanceof SavingsAccount savingsRecipient)) {
             throw new IllegalArgumentException("Business accounts can only pay to Savings Accounts.");
         }
 
@@ -68,8 +68,8 @@ public class BusinessAccount extends CreditAccount {
         savingsRecipient.adjustAccountBalance(amount);
 
         // Log the transaction
-        addNewTransaction(recipient.getAccountNumber(), Transaction.Transactions.FUNDTRANSFER,
-                String.format("Paid Php %.2f to %s (Business Transaction)", amount, recipient.getAccountNumber()));
+        addNewTransaction(account.getAccountNumber(), Transaction.Transactions.FUNDTRANSFER,
+                String.format("Paid Php %.2f to %s (Business Transaction)", amount, account.getAccountNumber()));
 
         savingsRecipient.addNewTransaction(getAccountNumber(), Transaction.Transactions.FUNDTRANSFER,
                 String.format("Received Php %.2f from Business Account %s", amount, getAccountNumber()));

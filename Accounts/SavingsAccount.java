@@ -7,19 +7,19 @@ import Bank.Bank;
  * It allows deposits, withdrawals, and fund transfers while enforcing banking rules.
  */
 public class SavingsAccount extends Account implements Withdrawal, Deposit, FundTransfer {
-
-    private double balance;  // The current balance of the savings account
+    // The current balance of the savings account
+    private double balance;
 
     /**
      * Constructor for SavingsAccount.
      *
-     * @param bank        The bank associated with this savings account.
-     * @param accountNumber The unique account number.
-     * @param ownerFname Owner's first name.
-     * @param ownerLname Owner's last name.
-     * @param ownerEmail       Owner's email address.
-     * @param pin         Security PIN for authentication.
-     * @param balance The initial deposit amount.
+     * @param bank - The bank associated with this savings account.
+     * @param accountNumber - The unique account number.
+     * @param ownerFname - Owner's first name.
+     * @param ownerLname - Owner's last name.
+     * @param ownerEmail - Owner's email address.
+     * @param pin - Security PIN for authentication.
+     * @param balance - The initial deposit amount.
      * @throws IllegalArgumentException If the initial deposit is below 0.
      */
     public SavingsAccount(Bank bank, String accountNumber, String pin, String ownerFname,
@@ -32,9 +32,9 @@ public class SavingsAccount extends Account implements Withdrawal, Deposit, Fund
     }
 
     /**
-     * Retrieves the account balance statement.
-     *
-     * @return The formatted balance statement.
+     * Get the account balance statement of this savings account.
+     * 
+     * @return - String balance statement.
      */
     public String getAccountBalanceStatement() {
         return String.format("SavingsAccount{Account Number: %s, Owner: %s, Balance: Php %.2f}", 
@@ -42,40 +42,45 @@ public class SavingsAccount extends Account implements Withdrawal, Deposit, Fund
     }
 
     /**
-     * Checks if the account has enough balance for a transaction.
-     *
-     * @param amount The amount to check.
-     * @return True if there is enough balance, false otherwise.
+     * Validates whether this savings account has enough balance to proceed with such a transaction
+     * based on the amount that is to be adjusted.
+     * 
+     * @param amount - Amount of money to be supposedly adjusted from this account’s balance.
+     * @return - Flag if transaction can proceed by adjusting the account balance by the amount to be
+     * changed.
      */
     public boolean hasEnoughBalance(double amount) {
         return balance >= amount;
     }
 
     /**
-     * Displays a warning when the account has insufficient balance.
+     * Warns the account owner that their balance is not enough for the transaction to proceed
+     * successfully.
      */
     public void insufficientBalance() {
         System.out.println("Warning: Insufficient balance to complete the transaction.");
     }
 
     /**
-     * Adjusts the account balance of this savings account.
-     *
-     * @param amount The amount to adjust.
+     * Adjust the account balance of this savings account based on the amount to be adjusted. If it
+     * results to the account balance going less than 0.0, then it is forcibly reset to 0.0.
+     * 
+     * @param amount - Amount to be added or subtracted from the account balance.
      */
     public void adjustAccountBalance(double amount) {
         this.balance += amount;
         if (this.balance < 0) {
-            this.balance = 0; // Prevent negative balances
+            this.balance = 0.0;
         }
     }
 
     /**
-     * Deposits an amount into this savings account.
-     *
-     * @param amount The amount to deposit.
-     * @return True if deposit is successful, false otherwise.
+     * Deposit some cash into this account. Cannot be greater than the bank’s deposit limit.
+     * 
+     * @param amount – Amount of money to be deposited.
+     * @return Flag if transaction is successful or not.
      */
+    @Override
     public boolean cashDeposit(double amount) {
         if (amount > bank.getDepositLimit()) {
             System.out.println("Deposit amount exceeds the bank's limit.");
@@ -91,10 +96,10 @@ public class SavingsAccount extends Account implements Withdrawal, Deposit, Fund
     }
 
     /**
-     * Withdraws an amount from this savings account.
-     *
-     * @param amount The amount to withdraw.
-     * @return True if withdrawal is successful, false otherwise.
+     * Withdraw an amount of money from this savings account. Cannot proceed if account does not
+     * have sufficient balance.
+     * 
+     * @param amount – Amount of money to be withdrawn.
      */
     @Override
     public boolean withdrawal(double amount) {
@@ -112,14 +117,20 @@ public class SavingsAccount extends Account implements Withdrawal, Deposit, Fund
     }
 
     /**
-     * Transfers funds to another SavingsAccount.
-     * <p>
-     * Internal transfers occur within the same bank, while external transfers include processing fees.
-     *
-     * @param recipient The recipient account.
-     * @param amount    The amount to transfer.
-     * @return True if the transfer was successful, false otherwise.
-     * @throws IllegalAccountType If attempting to transfer to a CreditAccount.
+     * Transfers an amount of money from this account to another savings account. Is extensively used
+     * by the other transfer() method
+     * <br><br>
+     * Cannot proceed if one of the following is true:
+     * <ul>
+     *     <li>Insufficient balance from source account.</li>
+     *     <li>Recepient account does not exist.</li>
+     *     <li>Recepient account is from another bank.</li>
+     * </ul>
+     * @param account – Account number of recipient
+     * @param amount – Amount of money to be supposedly adjusted from this account’s balance.
+     * @throws IllegalAccountType Cannot fund transfer when the other account is of type
+     * CreditAccount.
+     * @return Flag if fund transfer transaction is successful or not.
      */
     @Override
     public boolean transfer(Account recipient, double amount) throws IllegalAccountType {
@@ -129,7 +140,7 @@ public class SavingsAccount extends Account implements Withdrawal, Deposit, Fund
 
         if (!hasEnoughBalance(amount) || amount <= 0 || amount > bank.getWithdrawLimit()) {
             insufficientBalance();
-            return false; // Insufficient funds or exceeding withdrawal limit
+            return false;
         }
 
         // Deduct from sender and add to recipient
@@ -146,20 +157,22 @@ public class SavingsAccount extends Account implements Withdrawal, Deposit, Fund
     }
 
     /**
-     * Transfers funds to another SavingsAccount from a different bank, applying a processing fee.
+     * Transfers an amount of money from this account to another savings account.
+     * Should be used when transferring to other banks.
      *
-     * @param recipientBank The recipient's bank.
-     * @param recipient     The recipient account.
-     * @param amount        The amount to transfer.
-     * @return True if the transfer was successful, false otherwise.
-     * @throws IllegalAccountType If attempting to transfer to a CreditAccount.
+     * @param bank Bank object of the recipient
+     * @param account Account number of recipient
+     * @param amount Amount of money to be supposedly adjusted from this account's balance
+     * @return Flag if fund transfer transaction is successful or not
+     * @throws IllegalAccountType Cannot fund transfer when the other account is of type CreditAccount
      */
+    @Override
     public boolean transfer(Bank recipientBank, Account recipient, double amount) throws IllegalAccountType {
         if (!(recipient instanceof SavingsAccount)) {
             throw new IllegalAccountType("Cannot transfer funds to a CreditAccount.");
         }
 
-        double totalAmount = amount + bank.getProcessingFee(); // Ensure sender pays fee
+        double totalAmount = amount + bank.getProcessingFee();
 
         if (!hasEnoughBalance(totalAmount) || amount <= 0 || totalAmount > bank.getWithdrawLimit()) {
             insufficientBalance();
