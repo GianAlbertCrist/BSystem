@@ -10,7 +10,6 @@ public class StudentAccount extends Account implements Deposit, Withdrawal {
 
     /**
      * Constructor for StudentAccount.
-     *
      * @param bank - The bank associated with this student account.
      * @param accountNumber - The unique account number.
      * @param pin - Security PIN for authentication.
