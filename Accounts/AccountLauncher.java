@@ -116,10 +116,25 @@ public class AccountLauncher {
 
         Main.showMenuHeader("Select a Bank");
         BankLauncher.showBanksMenu();
-        Main.setOption();
 
-        int bankIndex = Main.getOption();
-        return BankLauncher.getBankByIndex(bankIndex).orElse(null); // Unwrapping Optional
+        Field <Integer, Integer> bankidField = new Field<>("Bank ID", Integer.class, 0, new Field.IntegerFieldValidator());
+        bankidField.setFieldValue("Enter Bank ID: ");
+
+        Field <String, String> bankNameField = new Field<>("Bank Name", String.class, null, new Field.StringFieldValidator());
+        bankNameField.setFieldValue("Enter Bank Name: ");
+
+        for (Bank bank : BankLauncher.getBanks()) {
+            if (bank.getBankId() == bankidField.getFieldValue() && bank.getName().equals(bankNameField.getFieldValue())) {
+                System.out.println("Bank selected: " + bank.getName());
+                return bank;
+            }
+        }
+        System.out.println("Bank does not exist.");
+        return null; 
+        // Main.setOption();
+
+        // int bankIndex = Main.getOption();
+        // return BankLauncher.getBankByIndex(bankIndex).orElse(null); // Unwrapping Optional
     }
 
     /**

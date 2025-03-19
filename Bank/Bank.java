@@ -253,13 +253,7 @@ public class Bank {
             }
 
             // If IDs are the same, compare names
-            int nameComparison = b1.getName().compareTo(b2.getName());
-            if (nameComparison != 0) {
-                return nameComparison;
-            }
-
-            // If names are the same, compare passcodes
-            return b1.getPasscode().compareTo(b2.getPasscode());
+            return b1.getName().compareTo(b2.getName());
         }
     }
 
