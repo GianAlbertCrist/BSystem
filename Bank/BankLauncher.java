@@ -5,7 +5,6 @@ import Main.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  *A class primarily used for interacting with the bank module
