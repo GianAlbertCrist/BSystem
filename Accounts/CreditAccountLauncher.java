@@ -41,7 +41,7 @@ public class CreditAccountLauncher {
     /**
      * Method that is utilized to process the credit payment transaction.
      */
-    public static void creditPaymentProcess() {
+    private static void creditPaymentProcess() {
         Field<String, Integer> recipientField = new Field<String, Integer>("Recipient Account Number", String.class, 5, new Field.StringFieldLengthValidator());
         recipientField.setFieldValue("Enter recipient Savings Account number: ");
 
@@ -70,7 +70,7 @@ public class CreditAccountLauncher {
     /**
      * Method that is utilized to process the credit compensation transaction.
      */
-    public static void creditRecompenseProcess() {
+    private static void creditRecompenseProcess() {
         Field<Double, Double> amountField = new Field<Double, Double>("Recompense Amount", Double.class, 1.0, new Field.DoubleFieldValidator());
         amountField.setFieldValue("Enter recompense amount: ");
 

@@ -43,7 +43,7 @@ public class SavingsAccountLauncher {
     /**
      * A method that deals with the deposit process transaction.
      */
-    public static void depositProcess() {
+    private static void depositProcess() {
         Field<Double, Double> amountField = new Field<Double, Double>("Deposit Amount", Double.class, 1.0, new Field.DoubleFieldValidator());
         amountField.setFieldValue("Enter deposit amount: ");
 
@@ -58,7 +58,7 @@ public class SavingsAccountLauncher {
     /**
      * A method that deals with the withdrawal process transaction.
      */
-    public static void withdrawProcess() {
+    private static void withdrawProcess() {
         Field<Double, Double> amountField = new Field<Double, Double>("Withdrawal Amount", Double.class, 1.0, new Field.DoubleFieldValidator());
         amountField.setFieldValue("Enter withdrawal amount: ");
 
@@ -73,7 +73,7 @@ public class SavingsAccountLauncher {
     /**
      * A method that deals with the fund transfer process transaction.
      */
-    public static void fundTransfer() throws IllegalAccountType {
+    private static void fundTransfer() throws IllegalAccountType {
         if (loggedAccount == null) {
             System.out.println("No account logged in.");
             return;
@@ -163,7 +163,8 @@ public class SavingsAccountLauncher {
      *
      * @return The logged-in SavingsAccount.
      */
-    public SavingsAccount getLoggedAccount() {
+    protected SavingsAccount getLoggedAccount() {
         return loggedAccount;
     }
 }
+
