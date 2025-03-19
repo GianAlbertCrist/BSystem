@@ -87,7 +87,7 @@ public class CreditAccountLauncher {
      * Get the Credit Account instance of the currently logged account.
      * @return The currently logged account
      */
-    protected static CreditAccount getLoggedAccount() {
+    private static CreditAccount getLoggedAccount() {
         return loggedAccount;
     }
 
