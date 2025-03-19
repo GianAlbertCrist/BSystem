@@ -61,17 +61,29 @@ public class Bank {
      * @param accountType – Type of account to be shown.
      */
     public <T extends Account> void showAccounts(Class<T> accountType) {
+        if (bankAccounts.isEmpty()) {
+            System.out.println("No accounts have been created.");
+            return; // Exit if there are no accounts
+        }
+    
         if (accountType == null) {
+            System.out.println("Showing all accounts:");
             for (Account account : bankAccounts) {
                 System.out.println(account);
             }
         } else {
             System.out.println("Showing accounts of type: " + accountType.getSimpleName());
+            boolean hasAccounts = false;
 
             for (Account account : bankAccounts) {
                 if (accountType.isInstance(account)) {
                     System.out.println(account);
+                    hasAccounts = true;
                 }
+            }
+
+            if (!hasAccounts) {
+                System.out.println("No " + accountType.getSimpleName() + " accounts have been created.");
             }
         }
     }
