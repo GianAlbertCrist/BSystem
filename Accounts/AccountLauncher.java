@@ -41,6 +41,11 @@ public class AccountLauncher {
             return;
         }
 
+        if (isLoggedIn()) {
+            System.out.println("Another account is already logged in. Please log out first.");
+            return;
+        }
+
         // Prompt user to select account type
         Main.showMenuHeader("Select Account Type");
         Main.showMenu(33);
@@ -146,6 +151,11 @@ public class AccountLauncher {
      * Destroy the log session of the previously logged user account.
      */
     public void destroyLogSession() {
+        if (!isLoggedIn()) {
+            System.out.println("No active session to log out from.");
+            return;
+        }
+        
         System.out.println("Logging out of " + loggedAccount.getAccountNumber());
         loggedAccount = null;
     }
