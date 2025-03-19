@@ -6,7 +6,7 @@ public class StudentAccount extends Account implements Deposit, Withdrawal {
 
     private double savingsBalance;
     private final int yearOfBirth;  // To calculate age for eligibility
-    private boolean hasPerks;  // Perks flag for eligible students
+    private final String studentId;
 
     /**
      * Constructor for StudentAccount.
@@ -18,11 +18,13 @@ public class StudentAccount extends Account implements Deposit, Withdrawal {
      * @param ownerLname - Owner's last name.
      * @param ownerEmail - Owner's email address.
      * @param yearOfBirth - The year of birth of the student (to check eligibility).
+     * @param studentId - The unique student ID.
      * @throws IllegalArgumentException If the student is not eligible (not between 18 and 25 years old).
      */
     public StudentAccount(Bank bank, String accountNumber, String pin, String ownerFname,
-                          String ownerLname, String ownerEmail, int yearOfBirth) {
+                          String ownerLname, String ownerEmail, int yearOfBirth, String studentId) {
         super(bank, accountNumber, pin, ownerFname, ownerLname, ownerEmail);
+        this.studentId = studentId;
         this.yearOfBirth = yearOfBirth;
         this.savingsBalance = 0.0;
 
@@ -30,9 +32,6 @@ public class StudentAccount extends Account implements Deposit, Withdrawal {
         if (!isEligibleForStudentAccount()) {
             throw new IllegalArgumentException("Account holder must be between 18 and 25 years old.");
         }
-
-        // Set perks for eligible students
-        this.hasPerks = true;
     }
 
     /**
@@ -120,11 +119,11 @@ public class StudentAccount extends Account implements Deposit, Withdrawal {
     /**
      * Get the account balance statement for this student account.
      *
-     * @return a string representing the account balance and perks status.
+     * @return a string representing the account balance .
      */
     public String getAccountBalanceStatement() {
         return String.format("StudentAccount{Account Number: %s, Owner: %s, Balance: Php %.2f, Has Perks: %b}",
-                this.getAccountNumber(), getOwnerFullName(), this.savingsBalance, this.hasPerks);
+                this.getAccountNumber(), getOwnerFullName(), this.savingsBalance);
     }
 
 
@@ -132,7 +131,4 @@ public class StudentAccount extends Account implements Deposit, Withdrawal {
         return this.savingsBalance;
     }
 
-    public boolean hasPerks() {
-        return this.hasPerks;
-    }
 }
