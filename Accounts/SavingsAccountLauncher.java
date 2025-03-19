@@ -100,8 +100,7 @@ public class SavingsAccountLauncher {
             Account recipient = loggedAccount.getBank().getBankAccount(recipientAccountNum);
 
             if (!(recipient instanceof SavingsAccount)) {
-                System.out.println("Recipient account not found or is not a Savings Account.");
-                return;
+                throw new IllegalAccountType("Cannot transfer funds to a CreditAccount.");
             }
 
             if (loggedAccount.transfer(recipient, amount)) {

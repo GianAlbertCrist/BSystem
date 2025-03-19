@@ -117,8 +117,8 @@ public class CreditAccount extends Account implements Payment, Recompense {
 
         // Deduct from the loan balance and log the recompense
         adjustLoanAmount(-amount);
-//        addNewTransaction(getAccountNumber(), Transaction.Transactions.Recompense,
-//                String.format("Recompensed Php %s to the bank.", amount));
+        addNewTransaction(getAccountNumber(), Transaction.Transactions.Recompense,
+                String.format("Recompensed Php %s to the bank.", amount));
 
         return true;
     }

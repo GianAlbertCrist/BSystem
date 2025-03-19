@@ -168,10 +168,6 @@ public class SavingsAccount extends Account implements Withdrawal, Deposit, Fund
      */
     @Override
     public boolean transfer(Bank bank, Account account, double amount) throws IllegalAccountType {
-        if (!(account instanceof SavingsAccount)) {
-            throw new IllegalAccountType("Cannot transfer funds to a CreditAccount.");
-        }
-
         double totalAmount = amount + this.bank.getProcessingFee();
 
         if (!hasEnoughBalance(totalAmount) || amount <= 0 || totalAmount > this.bank.getWithdrawLimit()) {
