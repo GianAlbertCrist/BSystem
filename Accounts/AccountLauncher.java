@@ -117,10 +117,10 @@ public class AccountLauncher {
         Main.showMenuHeader("Select a Bank");
         BankLauncher.showBanksMenu();
 
-        Field <Integer, Integer> bankidField = new Field<>("Bank ID", Integer.class, 0, new Field.IntegerFieldValidator());
+        Field <Integer, Integer> bankidField = new Field<Integer, Integer>("Bank ID", Integer.class, 0, new Field.IntegerFieldValidator());
         bankidField.setFieldValue("Enter Bank ID: ");
 
-        Field <String, String> bankNameField = new Field<>("Bank Name", String.class, null, new Field.StringFieldValidator());
+        Field <String, String> bankNameField = new Field<String, String>("Bank Name", String.class, null, new Field.StringFieldValidator());
         bankNameField.setFieldValue("Enter Bank Name: ");
 
         for (Bank bank : BankLauncher.getBanks()) {
@@ -131,10 +131,6 @@ public class AccountLauncher {
         }
         System.out.println("Bank does not exist.");
         return null; 
-        // Main.setOption();
-
-        // int bankIndex = Main.getOption();
-        // return BankLauncher.getBankByIndex(bankIndex).orElse(null); // Unwrapping Optional
     }
 
     /**

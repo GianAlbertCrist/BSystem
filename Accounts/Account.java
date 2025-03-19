@@ -8,10 +8,10 @@ import java.util.ArrayList;
  */
 public abstract class Account {
     //A constant bank object associated to this account.
-    protected final Bank bank;
+    private final Bank bank;
     //accountNumber - Account number of this account object. Cannot be modified once set.
-    protected final String accountNumber, ownerFname, ownerLname, ownerEmail;
-    protected String pin;
+    private final String accountNumber, ownerFname, ownerLname, ownerEmail;
+    private String pin;
     /**
      * Transactions refer to the transaction logs recorded in this account.
      * A transaction is logged based on the following:
@@ -20,7 +20,7 @@ public abstract class Account {
      * 3. A successful payment.
      * 4. A successful fund transfer.
      */
-    protected final ArrayList<Transaction> transactions;
+    private final ArrayList<Transaction> transactions;
 
     //Constructor
     public Account(Bank bank, String accountNumber, String pin, String ownerFname,

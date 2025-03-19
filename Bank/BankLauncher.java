@@ -277,6 +277,10 @@ public class BankLauncher {
         }
     }
 
+    public static ArrayList<Bank> getBanks() {
+        return banks;
+    }
+
     /**
      * Returns the number of registered banks.
      *
@@ -284,23 +288,6 @@ public class BankLauncher {
      */
     public static int bankSize() {
         return banks.size();
-    }
-
-    /**
-     * Retrieves a bank by index.
-     *
-     * @param index The index of the bank.
-     * @return Optional of Bank.
-     */
-    public static Optional<Bank> getBankByIndex(int index) {
-        if (index > 0 && index <= banks.size()) {
-            return Optional.of(banks.get(index - 1));
-        }
-        return Optional.empty();
-    }
-
-    public static ArrayList<Bank> getBanks() {
-        return banks;
     }
 
     /**

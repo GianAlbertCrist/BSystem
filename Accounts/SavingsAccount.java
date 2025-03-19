@@ -38,7 +38,7 @@ public class SavingsAccount extends Account implements Withdrawal, Deposit, Fund
      */
     public String getAccountBalanceStatement() {
         return String.format("SavingsAccount{Account Number: %s, Owner: %s, Balance: Php %.2f}", 
-                                    this.accountNumber, getOwnerFullName(), this.balance);
+                                    this.getAccountNumber(), getOwnerFullName(), this.balance);
     }
 
     /**
@@ -82,7 +82,7 @@ public class SavingsAccount extends Account implements Withdrawal, Deposit, Fund
      */
     @Override
     public boolean cashDeposit(double amount) {
-        if (amount > bank.getDepositLimit()) {
+        if (amount > getBank().getDepositLimit()) {
             System.out.println("Deposit amount exceeds the bank's limit.");
             return false;
         }
@@ -103,14 +103,14 @@ public class SavingsAccount extends Account implements Withdrawal, Deposit, Fund
      */
     @Override
     public boolean withdrawal(double amount) {
-        if (amount <= 0 || amount > balance || amount > bank.getWithdrawLimit()) {
+        if (amount <= 0 || amount > balance || amount > getBank().getWithdrawLimit()) {
             insufficientBalance();
             return false; // Cannot withdraw more than available balance or withdrawal limit
         }
 
         // Adjust balance and log transaction
         adjustAccountBalance(-amount);
-        addNewTransaction(accountNumber, Transaction.Transactions.Withdraw,
+        addNewTransaction(getAccountNumber(), Transaction.Transactions.Withdraw,
                 String.format("Withdraw Php %.2f", amount));
 
         return true;
@@ -138,7 +138,7 @@ public class SavingsAccount extends Account implements Withdrawal, Deposit, Fund
             throw new IllegalAccountType("Cannot transfer funds to a CreditAccount.");
         }
 
-        if (!hasEnoughBalance(amount) || amount <= 0 || amount > bank.getWithdrawLimit()) {
+        if (!hasEnoughBalance(amount) || amount <= 0 || amount > getBank().getWithdrawLimit()) {
             insufficientBalance();
             return false;
         }
@@ -150,8 +150,8 @@ public class SavingsAccount extends Account implements Withdrawal, Deposit, Fund
         // Log transactions for both accounts
         addNewTransaction(account.getAccountNumber(), Transaction.Transactions.FundTransfer,
                 String.format("Transferred Php %.2f to %s", amount, account.getAccountNumber()));
-        account.addNewTransaction(accountNumber, Transaction.Transactions.ReceiveTransfer,
-                String.format("Received Php %.2f from %s", amount, accountNumber));
+        account.addNewTransaction(getAccountNumber(), Transaction.Transactions.ReceiveTransfer,
+                String.format("Received Php %.2f from %s", amount, getAccountNumber()));
 
         return true;
     }
@@ -168,9 +168,9 @@ public class SavingsAccount extends Account implements Withdrawal, Deposit, Fund
      */
     @Override
     public boolean transfer(Bank bank, Account account, double amount) throws IllegalAccountType {
-        double totalAmount = amount + this.bank.getProcessingFee();
+        double totalAmount = amount + this.getBank().getProcessingFee();
 
-        if (!hasEnoughBalance(totalAmount) || amount <= 0 || totalAmount > this.bank.getWithdrawLimit()) {
+        if (!hasEnoughBalance(totalAmount) || amount <= 0 || totalAmount > this.getBank().getWithdrawLimit()) {
             insufficientBalance();
             return false; // Insufficient funds or exceeding withdrawal limit
         }
@@ -184,10 +184,10 @@ public class SavingsAccount extends Account implements Withdrawal, Deposit, Fund
         // Log transactions for both accounts
         addNewTransaction(account.getAccountNumber(), Transaction.Transactions.ExternalTransfer,
                 String.format("Transferred Php %.2f to %s at %s (Fee: Php %.2f)", 
-                                    amount, account.getAccountNumber(), bank.getName(), this.bank.getProcessingFee()));
+                                    amount, account.getAccountNumber(), bank.getName(), this.getBank().getProcessingFee()));
 
-        account.addNewTransaction(accountNumber, Transaction.Transactions.ReceiveTransfer,
-                String.format("Received Php %.2f from %s at %s", amount, this.accountNumber, this.bank.getName()));
+        account.addNewTransaction(getAccountNumber(), Transaction.Transactions.ReceiveTransfer,
+                String.format("Received Php %.2f from %s at %s", amount, this.getAccountNumber(), this.getBank().getName()));
 
         return true;
     }

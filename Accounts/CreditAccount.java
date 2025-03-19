@@ -33,7 +33,7 @@ public class CreditAccount extends Account implements Payment, Recompense {
      */
     public String getLoanStatement() {
         return String.format("CreditAccount{Account Number: %s, Owner: %s, Loan Balance: Php %.2f}",
-                                    accountNumber, getOwnerFullName(), loanBalance);
+                                    getAccountNumber(), getOwnerFullName(), loanBalance);
     }
 
     //Getter
@@ -50,7 +50,7 @@ public class CreditAccount extends Account implements Payment, Recompense {
      * @return Flag if this account can continue with the credit transaction.
      */
     public boolean canCredit(double amountAdjustment) {
-        return (loanBalance + amountAdjustment) <= bank.getCreditLimit();
+        return (loanBalance + amountAdjustment) <= getBank().getCreditLimit();
     }
 
  
@@ -95,8 +95,8 @@ public class CreditAccount extends Account implements Payment, Recompense {
         addNewTransaction(account.getAccountNumber(), Transaction.Transactions.Payment,
                 String.format("Paid Php %.2f to %s", amount, account.getAccountNumber()));
 
-        savingsAccount.addNewTransaction(this.accountNumber, Transaction.Transactions.ReceiveTransfer,
-                String.format("Received Php %.2f from Credit Account %s", amount, this.accountNumber));
+        savingsAccount.addNewTransaction(this.getAccountNumber(), Transaction.Transactions.ReceiveTransfer,
+                String.format("Received Php %.2f from Credit Account %s", amount, this.getAccountNumber()));
 
         System.out.println("Payment successful. New loan balance: Php" + this.loanBalance);
         return true;
@@ -117,8 +117,8 @@ public class CreditAccount extends Account implements Payment, Recompense {
 
         // Deduct from the loan balance and log the recompense
         adjustLoanAmount(-amount);
-        addNewTransaction(getAccountNumber(), Transaction.Transactions.Recompense,
-                String.format("Recompensed Php %s to the bank.", amount));
+         addNewTransaction(getAccountNumber(), Transaction.Transactions.Recompense,
+                 String.format("Recompensed Php %s to the bank.", amount));
 
         return true;
     }
