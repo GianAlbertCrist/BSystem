@@ -1,4 +1,6 @@
-package Accounts;
+package Processes;
+
+import Accounts.Account;
 
 public interface Payment {
 

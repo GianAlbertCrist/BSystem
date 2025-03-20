@@ -1,6 +1,7 @@
 package Accounts;
 
 import Bank.Bank;
+import Processes.*;
 
 public class BusinessAccount extends Account implements Deposit, Withdrawal, FundTransfer {
     private double businessBalance;

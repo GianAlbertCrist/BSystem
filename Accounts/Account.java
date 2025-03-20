@@ -1,6 +1,8 @@
 package Accounts;
 
 import Bank.Bank;
+import Processes.Transaction;
+
 import java.util.ArrayList;
 
 /**

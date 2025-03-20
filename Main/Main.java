@@ -1,7 +1,7 @@
 package Main;
 
 import Accounts.AccountLauncher;
-import Accounts.IllegalAccountType;
+import Processes.IllegalAccountType;
 import Bank.*;
 
 import java.util.Scanner;

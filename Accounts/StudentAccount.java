@@ -1,6 +1,9 @@
 package Accounts;
 
 import Bank.Bank;
+import Processes.Deposit;
+import Processes.Transaction;
+import Processes.Withdrawal;
 
 public class StudentAccount extends Account implements Deposit, Withdrawal {
 

@@ -3,6 +3,7 @@ package Accounts;
 import Bank.Bank;
 import Bank.BankLauncher;
 import Main.*;
+import Processes.IllegalAccountType;
 
 /**
  * A class primarily used for interacting with the account module.

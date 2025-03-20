@@ -1,5 +1,6 @@
-package Accounts;
+package Processes;
 
+import Accounts.Account;
 import Bank.Bank;
 
 public interface FundTransfer{

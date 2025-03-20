@@ -1,7 +1,7 @@
 package Tests;
 
 import Accounts.CreditAccount;
-import Accounts.IllegalAccountType;
+import Processes.IllegalAccountType;
 import Accounts.SavingsAccount;
 import Bank.Bank;
 import Bank.BankLauncher;
