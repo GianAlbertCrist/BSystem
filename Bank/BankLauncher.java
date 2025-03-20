@@ -51,7 +51,7 @@ public class BankLauncher {
      * Must prompt the user to select which type of accounts to show:
      * (1) Credit Accounts, (2) Savings Accounts, (3) All, and (4) Create New Account.
      */
-    public static void showAccounts() {
+    private static void showAccounts() {
         if (loggedBank == null) {
             System.out.println("No bank logged in.");
             return;
@@ -72,7 +72,7 @@ public class BankLauncher {
     /**
      * Handles the creation of a new account within the currently logged-in bank.
      */
-    public static void newAccounts() {
+    private static void newAccounts() {
         if (loggedBank == null) {
             System.out.println("No bank logged in.");
             return;
@@ -140,7 +140,7 @@ public class BankLauncher {
      *
      * @param bank The bank to log into.
      */
-    public static void setLogSession(Bank bank) {
+    private static void setLogSession(Bank bank) {
         loggedBank = bank;
     }
 
@@ -159,7 +159,7 @@ public class BankLauncher {
      *
      * @param b The bank to be added.
      */
-    public static void addBank(Bank b) {
+    private static void addBank(Bank b) {
         banks.add(b);
         System.out.println("Bank successfully added: " + b.getName());
     }
@@ -195,7 +195,6 @@ public class BankLauncher {
      * Display all accounts registered under the logged-in bank.
      */
     private static void displayAllAccounts() {
-        System.out.println("Showing all accounts:");
         loggedBank.showAccounts(null);
     }
 
@@ -212,67 +211,87 @@ public class BankLauncher {
      * Creates a new bank and registers it in the system.
      */
     public static void createNewBank() {
-
+    
         Field<String, String> bankNameField = new Field<String, String>("Bank Name", String.class, null, new Field.StringFieldValidator());
         bankNameField.setFieldValue("Enter Bank Name: ", false);
-
-        if (bankNameField.getFieldValue().isEmpty()) {
+    
+        if (bankNameField.getFieldValue() == null || bankNameField.getFieldValue().isEmpty()) {
             System.out.println("Error: Bank Name is required!");
             return; // Exit early
         }
-
+    
         Field<String, Integer> bankPasscodeField = new Field<String, Integer>("Bank Passcode", String.class, 4, new Field.StringFieldLengthValidator());
         bankPasscodeField.setFieldValue("Enter Bank Passcode: ");
-
+    
         if (bankPasscodeField.getFieldValue() == null || bankPasscodeField.getFieldValue().length() < 4) {
             System.out.println("Error: Passcode must be at least 4 characters long.");
             return; // Exit early
         }
-
-        // Ask user if they want to set custom limits
-        String choice = Main.prompt("Do you want to set custom deposit, withdrawal, and credit limits? (Y/N):", true).trim().toUpperCase();
-
-        Bank newBank;
-
-        if (choice.equals("Y")) {
-            // Custom Limits Fields
-            Field<Double, Double> depositLimitField = new Field<Double, Double>("Deposit Limit", Double.class, 0.0, new Field.DoubleFieldValidator());
-            depositLimitField.setFieldValue("Enter Deposit Limit: ");
-
-            Field<Double, Double> withdrawLimitField = new Field<Double, Double>("Withdraw Limit", Double.class, 0.0, new Field.DoubleFieldValidator());
-            withdrawLimitField.setFieldValue("Enter Withdraw Limit: ");
-
-            Field<Double, Double> creditLimitField = new Field<Double, Double>("Credit Limit", Double.class, 0.0, new Field.DoubleFieldValidator());
-            creditLimitField.setFieldValue("Enter Credit Limit: ");
-
-            Field<Double, Double> processingFeeField = new Field<Double, Double>("Processing Fee", Double.class, 0.0, new Field.DoubleFieldValidator());
-            processingFeeField.setFieldValue("Enter Processing Fee: ");
-
-            // Create Bank with custom values
-            newBank = new Bank(
-                    bankSize(),
-                    bankNameField.getFieldValue(),
-                    bankPasscodeField.getFieldValue(),
-                    depositLimitField.getFieldValue(),
-                    withdrawLimitField.getFieldValue(),
-                    creditLimitField.getFieldValue(),
-                    processingFeeField.getFieldValue()
-            );
-        } else {
-            // Create Bank with default values
-            newBank = new Bank(
-                    bankSize(),
-                    bankNameField.getFieldValue(),
-                    bankPasscodeField.getFieldValue()
-            );
+    
+        Bank newBank = null;
+    
+        boolean ans = true;
+        while (ans) {
+            // Ask user if they want to set custom limits
+            String choice = Main.prompt("Do you want to set custom deposit, withdrawal, credit limits and proccessing fee? (Y/N):", true).trim().toUpperCase();
+    
+            if (choice.equals("Y")) {
+                // Custom Limits Fields
+                Field<Double, Double> depositLimitField = new Field<Double, Double>("Deposit Limit", Double.class, 0.0, new Field.DoubleFieldValidator());
+                depositLimitField.setFieldValue("Enter Deposit Limit: ");
+    
+                Field<Double, Double> withdrawLimitField = new Field<Double, Double>("Withdraw Limit", Double.class, 0.0, new Field.DoubleFieldValidator());
+                withdrawLimitField.setFieldValue("Enter Withdraw Limit: ");
+    
+                Field<Double, Double> creditLimitField = new Field<Double, Double>("Credit Limit", Double.class, 0.0, new Field.DoubleFieldValidator());
+                creditLimitField.setFieldValue("Enter Credit Limit: ");
+    
+                Field<Double, Double> processingFeeField = new Field<Double, Double>("Processing Fee", Double.class, 0.0, new Field.DoubleFieldValidator());
+                processingFeeField.setFieldValue("Enter Processing Fee: ");
+    
+                // Validate custom fields
+                if (depositLimitField.getFieldValue() == null || withdrawLimitField.getFieldValue() == null ||
+                    creditLimitField.getFieldValue() == null || processingFeeField.getFieldValue() == null) {
+                    System.out.println("Error: All custom limits must be provided.");
+                    return; // Exit early
+                }
+    
+                // Create Bank with custom values
+                newBank = new Bank(
+                        bankSize(),
+                        bankNameField.getFieldValue(),
+                        bankPasscodeField.getFieldValue(),
+                        depositLimitField.getFieldValue(),
+                        withdrawLimitField.getFieldValue(),
+                        creditLimitField.getFieldValue(),
+                        processingFeeField.getFieldValue()
+                );
+                ans = false;
+    
+            } else if (choice.equals("N")) {
+                // Create Bank with default values
+                newBank = new Bank(
+                        bankSize(),
+                        bankNameField.getFieldValue(),
+                        bankPasscodeField.getFieldValue()
+                );
+                ans = false;
+    
+            } else {
+                System.out.println("Invalid input: Input Y or N only. Please try again.");
+            }
         }
-
+    
         // Add Bank to the List
         if (getBank(new Bank.BankComparator(), newBank) == null) {
             System.out.println("Bank created successfully: " + newBank);
             addBank(newBank);
         } else {
-            System.out.printf("Bank %s already exists!\n", newBank.getName());
+            if (newBank != null) {
+                System.out.printf("Bank %s already exists!\n", newBank.getName());
+            } else {
+                System.out.println("Error: Bank creation failed.");
+            }
         }
     }
 
@@ -297,7 +316,7 @@ public class BankLauncher {
      */
     public static Account findAccount(String accountNum) {
         return banks.stream()
-                .map(bank -> bank.getBankAccount(accountNum))
+                .map(bank -> bank.getBankAccount(bank, accountNum))
                 .filter(Objects::nonNull)
                 .findFirst()
                 .orElse(null);

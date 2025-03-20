@@ -16,7 +16,7 @@ public class SavingsAccountLauncher {
      * Mainly utilized for showing the main menu after Savings Account users log in to the application.
      */
     public static void savingsAccountInit() throws IllegalAccountType {
-        if (loggedAccount == null) {
+        if (getLoggedAccount() == null) {
             System.out.println("No account logged in.");
             return;
         }
@@ -27,11 +27,11 @@ public class SavingsAccountLauncher {
             Main.setOption();
 
             switch (Main.getOption()) {
-                case 1 -> System.out.println(loggedAccount.getAccountBalanceStatement());
+                case 1 -> System.out.println(getLoggedAccount().getAccountBalanceStatement());
                 case 2 -> depositProcess();
                 case 3 -> withdrawProcess();
                 case 4 -> fundTransfer();
-                case 5 -> System.out.println(loggedAccount.getTransactionsInfo());
+                case 5 -> System.out.println(getLoggedAccount().getTransactionsInfo());
                 case 6 -> {
                     return;
                 }
@@ -48,7 +48,7 @@ public class SavingsAccountLauncher {
         amountField.setFieldValue("Enter deposit amount: ");
 
         double amount = amountField.getFieldValue();
-        if (loggedAccount.cashDeposit(amount)) {
+        if (getLoggedAccount().cashDeposit(amount)) {
             System.out.println("Deposit successful.");
         } else {
             System.out.println("Deposit failed. Amount exceeds limit or is invalid.");
@@ -63,7 +63,7 @@ public class SavingsAccountLauncher {
         amountField.setFieldValue("Enter withdrawal amount: ");
 
         double amount = amountField.getFieldValue();
-        if (loggedAccount.withdrawal(amount)) {
+        if (getLoggedAccount().withdrawal(amount)) {
             System.out.println("Withdrawal successful.");
         } else {
             System.out.println("Withdrawal failed. Insufficient balance or exceeds withdrawal limit.");
@@ -74,7 +74,7 @@ public class SavingsAccountLauncher {
      * A method that deals with the fund transfer process transaction.
      */
     private static void fundTransfer() throws IllegalAccountType {
-        if (loggedAccount == null) {
+        if (getLoggedAccount() == null) {
             System.out.println("No account logged in.");
             return;
         }
@@ -97,13 +97,15 @@ public class SavingsAccountLauncher {
         double amount = amountField.getFieldValue();
 
         if (transferType == 1) { // Internal Transfer
-            Account recipient = loggedAccount.getBank().getBankAccount(recipientAccountNum);
+            Account recipient = getLoggedAccount().getBank().getBankAccount(getLoggedAccount().getBank(), recipientAccountNum);
 
             if (!(recipient instanceof SavingsAccount)) {
                 throw new IllegalAccountType("Cannot transfer funds to a CreditAccount.");
             }
 
-            if (loggedAccount.transfer(recipient, amount)) {
+            if (recipientAccountNum.equals(getLoggedAccount().getAccountNumber())) {
+                System.out.println("Warning: You are transferring to your own account. Transfer failed.");
+            } else if (getLoggedAccount().transfer(recipient, amount)) {
                 System.out.println("Internal transfer successful.");
             } else {
                 System.out.println("Transfer failed. Insufficient funds or limit exceeded.");
@@ -129,16 +131,16 @@ public class SavingsAccountLauncher {
                 return;
             }
 
-            Account recipient = recipientBank.getBankAccount(recipientAccountNum);
+            Account recipient = recipientBank.getBankAccount(recipientBank, recipientAccountNum);
 
             if (!(recipient instanceof SavingsAccount)) {
                 System.out.println("Recipient account not found or is not a Savings Account.");
                 return;
             }
 
-            if (loggedAccount.transfer(recipientBank, recipient, amount)) {
+            if (getLoggedAccount().transfer(recipientBank, recipient, amount)) {
                 System.out.println("External transfer successful. Processing fee of Php" +
-                        loggedAccount.getBank().getProcessingFee() + " applied.");
+                        getLoggedAccount().getBank().getProcessingFee() + " applied.");
             } else {
                 System.out.println("Transfer failed. Insufficient funds or limit exceeded.");
             }
@@ -148,23 +150,23 @@ public class SavingsAccountLauncher {
         }
     }
 
-
-    /**
-     * Sets the currently logged-in Savings Account.
-     *
-     * @param account The logged-in SavingsAccount.
-     */
-    public static void setLoggedAccount(SavingsAccount account) {
-        loggedAccount = account;
-    }
-
     /**
      * Get the Savings Account instance of the currently logged account.
      *
-     * @return The logged-in SavingsAccount.
+     * @return SavingsAccount object
      */
-    protected SavingsAccount getLoggedAccount() {
-        return loggedAccount;
+    protected static SavingsAccount getLoggedAccount() {
+        Account account = AccountLauncher.getLoggedAccount();
+        if (account == null) {
+            System.out.println("No logged-in account.");
+            return null;
+        }
+
+        if (account instanceof SavingsAccount savingsAccount) {
+            return savingsAccount;
+        } else {
+            System.out.println("No logged-in savings account found.");
+            return null;
+        }
     }
 }
-

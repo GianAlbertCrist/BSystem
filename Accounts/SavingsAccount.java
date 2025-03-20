@@ -49,7 +49,7 @@ public class SavingsAccount extends Account implements Withdrawal, Deposit, Fund
      * @return - Flag if transaction can proceed by adjusting the account balance by the amount to be
      * changed.
      */
-    public boolean hasEnoughBalance(double amount) {
+    private boolean hasEnoughBalance(double amount) {
         return balance >= amount;
     }
 
@@ -57,7 +57,7 @@ public class SavingsAccount extends Account implements Withdrawal, Deposit, Fund
      * Warns the account owner that their balance is not enough for the transaction to proceed
      * successfully.
      */
-    public void insufficientBalance() {
+    private void insufficientBalance() {
         System.out.println("Warning: Insufficient balance to complete the transaction.");
     }
 

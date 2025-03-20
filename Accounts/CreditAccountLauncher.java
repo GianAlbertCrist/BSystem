@@ -6,16 +6,14 @@ import Main.*;
 /**
  * Credit Account Launcher class for handling credit account operations.
  */
-public class CreditAccountLauncher {
-
-    private static CreditAccount loggedAccount;
+public class CreditAccountLauncher extends AccountLauncher {
 
     /**
      * Method that deals with all things about credit accounts. Mainly utilized for showing the main
      * menu after Credit Account users log in to the application.
      */
     public static void creditAccountInit() {
-        if (loggedAccount == null) {
+        if (getLoggedAccount() == null) {
             System.out.println("No account logged in.");
             return;
         }
@@ -26,10 +24,10 @@ public class CreditAccountLauncher {
             Main.setOption();
 
             switch (Main.getOption()) {
-                case 1 -> System.out.println(loggedAccount.getLoanStatement());
+                case 1 -> System.out.println(getLoggedAccount().getLoanStatement());
                 case 2 -> creditPaymentProcess();
                 case 3 -> creditRecompenseProcess();
-                case 4 -> System.out.println(loggedAccount.getTransactionsInfo());
+                case 4 -> System.out.println(getLoggedAccount().getTransactionsInfo());
                 case 5 -> {
                     return;
                 }
@@ -51,15 +49,15 @@ public class CreditAccountLauncher {
         String recipientAccountNum = recipientField.getFieldValue();
         double amount = amountField.getFieldValue();
 
-        Bank recipientBank = loggedAccount.getBank();
-        Account recipientAccount = recipientBank.getBankAccount(recipientAccountNum);
+        Bank recipientBank = getLoggedAccount().getBank();
+        Account recipientAccount = recipientBank.getBankAccount(recipientBank, recipientAccountNum);
 
         if (!(recipientAccount instanceof SavingsAccount)) {
             System.out.println("Recipient account not found or is not a Savings Account.");
             return;
         }
 
-        if (loggedAccount.pay(recipientAccount, amount)) {
+        if (getLoggedAccount().pay(recipientAccount, amount)) {
             System.out.println("Credit payment successful.");
         } else {
             System.out.println("Credit payment failed. Insufficient funds or invalid amount.");
@@ -76,7 +74,7 @@ public class CreditAccountLauncher {
 
         double amount = amountField.getFieldValue();
 
-        if (loggedAccount.recompense(amount)) {
+        if (getLoggedAccount().recompense(amount)) {
             System.out.println("Recompense successful.");
         } else {
             System.out.println("Recompense failed. Amount exceeds loan balance.");
@@ -87,16 +85,18 @@ public class CreditAccountLauncher {
      * Get the Credit Account instance of the currently logged account.
      * @return The currently logged account
      */
-    private static CreditAccount getLoggedAccount() {
-        return loggedAccount;
-    }
+    public static CreditAccount getLoggedAccount() {
+        Account account = AccountLauncher.getLoggedAccount();
+        if (account == null) {
+            System.out.println("No logged-in account.");
+            return null;
+        }
 
-    /**
-     * Sets the currently logged-in Credit Account.
-     *
-     * @param account The logged-in CreditAccount.
-     */
-    public static void setLoggedAccount(CreditAccount account) {
-        loggedAccount = account;
+        if (account instanceof CreditAccount creditAccount) {
+            return creditAccount;
+        } else {
+            System.out.println("Logged-in account is not a credit account.");
+            return null;
+        }
     }
 }

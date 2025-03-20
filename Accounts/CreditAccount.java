@@ -49,7 +49,7 @@ public class CreditAccount extends Account implements Payment, Recompense {
      * processed.
      * @return Flag if this account can continue with the credit transaction.
      */
-    public boolean canCredit(double amountAdjustment) {
+    private boolean canCredit(double amountAdjustment) {
         return (loanBalance + amountAdjustment) <= getBank().getCreditLimit();
     }
 
@@ -59,7 +59,7 @@ public class CreditAccount extends Account implements Payment, Recompense {
      *
      * @param amountAdjustment Amount to be adjusted to the loan of this credit account.
      */
-    public void adjustLoanAmount(double amountAdjustment) {
+    private void adjustLoanAmount(double amountAdjustment) {
         this.loanBalance += amountAdjustment;
         if (this.loanBalance < 0) {
             this.loanBalance = 0.0;

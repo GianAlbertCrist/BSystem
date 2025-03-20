@@ -4,6 +4,7 @@ import Accounts.Account;
 import Accounts.CreditAccount;
 import Accounts.SavingsAccount;
 import Main.Field;
+import Main.Main;
 import java.util.ArrayList;
 import java.util.Comparator;
 
@@ -68,20 +69,21 @@ public class Bank {
     
         if (accountType == null) {
             System.out.println("Showing all accounts:");
+            int count = 1;
             for (Account account : bankAccounts) {
-                System.out.println(account);
+                System.out.println(count + ".) " + account);
+                count++;
             }
         } else {
-            System.out.println("Showing accounts of type: " + accountType.getSimpleName());
             boolean hasAccounts = false;
-
+            int count = 1;
             for (Account account : bankAccounts) {
                 if (accountType.isInstance(account)) {
-                    System.out.println(account);
+                    System.out.println(count + ".) " + account);
                     hasAccounts = true;
+                    count++;
                 }
             }
-
             if (!hasAccounts) {
                 System.out.println("No " + accountType.getSimpleName() + " accounts have been created.");
             }
@@ -93,8 +95,8 @@ public class Bank {
      * @param accountNum – Account number of target account.
      * @return The account associated with the provided account number, or null if no such account exists.
      */
-    public Account getBankAccount(String accountNum) {
-        for (Account account : bankAccounts) {
+    public Account getBankAccount(Bank bank, String accountNum) {
+        for (Account account : bank.bankAccounts) {
             if (account.getAccountNumber().equals(accountNum)) {
                 return account;
             }
@@ -113,7 +115,7 @@ public class Bank {
         // Create fields with appropriate validation
         Field<String, Integer> accountNumberField = new Field<String, Integer>("Account Number", String.class, 5, new Field.StringFieldLengthValidator());
 
-        Field<String, Integer> pinField = new Field<String, Integer>("PIN", String.class, 4, new Field.StringFieldLengthValidator());
+        Field<String, Integer> pinField = new Field<String, Integer>("PIN", String.class, 4, new Field.PinFieldValidator());
 
         Field<String, String> firstNameField = new Field<String, String>("First Name", String.class, null, new Field.StringFieldValidator());
 
@@ -145,7 +147,7 @@ public class Bank {
         String lastName = (String) accountData.get(3).getFieldValue();
         String email = (String) accountData.get(4).getFieldValue();
 
-        double initialDeposit = Double.parseDouble(Main.Main.prompt("Enter Initial Deposit: ", true));
+        double initialDeposit = Double.parseDouble(Main.prompt("Enter Initial Deposit: ", true));
 
         SavingsAccount newAccount = new SavingsAccount(this, accountNumber, pin, firstName, lastName, email, initialDeposit);
         addNewAccount(newAccount);
