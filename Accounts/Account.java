@@ -2,7 +2,6 @@ package Accounts;
 
 import Bank.Bank;
 import Processes.Transaction;
-
 import java.util.ArrayList;
 
 /**
@@ -78,6 +77,7 @@ public abstract class Account {
      */
     public void addNewTransaction(String accountNum, Transaction.Transactions type, String description) {
         transactions.add(new Transaction(accountNum, type, description));
+        
     }
 
     /**

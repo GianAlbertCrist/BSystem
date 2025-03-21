@@ -1,6 +1,7 @@
 package Bank;
 
 import Accounts.Account;
+import Accounts.AccountLauncher;
 import Accounts.CreditAccount;
 import Accounts.SavingsAccount;
 import Main.Field;
@@ -27,6 +28,7 @@ public class Bank {
     //Processing fee added when some transaction is involved with another bank. Cannot be lower
     //than 0.0. Defaults to 10.00
     private final double processingFee;
+    //List of accounts registered to this bank.
     private final ArrayList<Account> bankAccounts;
 
     /**
@@ -62,11 +64,12 @@ public class Bank {
      * @param accountType – Type of account to be shown.
      */
     public <T extends Account> void showAccounts(Class<T> accountType) {
+        // Check if there are any accounts
         if (bankAccounts.isEmpty()) {
             System.out.println("No accounts have been created.");
-            return; // Exit if there are no accounts
+            return;
         }
-    
+        // If no account type specified, show all accounts in the bank.
         if (accountType == null) {
             System.out.println("Showing all accounts:");
             int count = 1;
@@ -74,7 +77,7 @@ public class Bank {
                 System.out.println(count + ".) " + account);
                 count++;
             }
-        } else {
+        } else { // accountType specified, show only accounts of that type
             boolean hasAccounts = false;
             int count = 1;
             for (Account account : bankAccounts) {
@@ -114,23 +117,18 @@ public class Bank {
 
         // Create fields with appropriate validation
         Field<String, Integer> accountNumberField = new Field<String, Integer>("Account Number", String.class, 5, new Field.StringFieldLengthValidator());
-
         Field<String, Integer> pinField = new Field<String, Integer>("PIN", String.class, 4, new Field.PinFieldValidator());
-
         Field<String, String> firstNameField = new Field<String, String>("First Name", String.class, null, new Field.StringFieldValidator());
-
         Field<String, String> lastNameField = new Field<String, String>("Last Name", String.class, null, new Field.StringFieldValidator());
-
         Field<String, String> emailField = new Field<String, String>("Email", String.class, null, new Field.StringFieldValidator());
 
         // Array of fields to prompt user input
         Field<?, ?>[] fields = {accountNumberField, pinField, firstNameField, lastNameField, emailField};
-
+        // Prompt user for input
         for (Field<?, ?> field : fields) {
             field.setFieldValue("Enter " + field.getFieldName() + ": ");
             accountFields.add(field);
         }
-
         return accountFields;
     }
 
@@ -140,6 +138,7 @@ public class Bank {
      * @return New savings account
      */
     public SavingsAccount createNewSavingsAccount() {
+        // Get account information
         ArrayList<Field<?, ?>> accountData = createNewAccount();
         String accountNumber = (String) accountData.get(0).getFieldValue();
         String pin = (String) accountData.get(1).getFieldValue();
@@ -160,6 +159,7 @@ public class Bank {
      * @return New credit account.
      */
     public CreditAccount createNewCreditAccount() {
+        // Get account information
         ArrayList<Field<?, ?>> accountData = createNewAccount();
         String accountNumber = (String) accountData.get(0).getFieldValue();
         String pin = (String) accountData.get(1).getFieldValue();
@@ -178,11 +178,14 @@ public class Bank {
      * @param account – Account object to be added into this bank.
      */
     public void addNewAccount(Account account) {
-        if (accountExists(this, account.getAccountNumber())) { // Only check within the same bank
+        // Check if account number already exists in this bank
+        if (accountExists(this, account.getAccountNumber())) {
             System.out.println("Account number already exists in this bank! Registration failed.");
             return;
         }
+        // Add the account to the bank
         bankAccounts.add(account);
+        AccountLauncher.saveAccounts();
         System.out.println(account);
         System.out.println("Account successfully registered.");
     }
@@ -195,10 +198,11 @@ public class Bank {
      * @return true if an account with the specified account number exists, false otherwise
      */
     public static boolean accountExists(Bank bank, String accountNum) {
+        // Check if bank or bank accounts are null
         if (bank == null || bank.getBankAccounts() == null) {
             return false;
         }
-
+        // Check if account number exists in the bank
         return bank.getBankAccounts().stream()
                 .anyMatch(account -> account.getAccountNumber().equals(accountNum));
     }

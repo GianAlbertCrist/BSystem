@@ -2,9 +2,11 @@ package Main;
 
 import Accounts.AccountLauncher;
 import Processes.IllegalAccountType;
+import Processes.Transaction;
 import Bank.*;
-
+import Database.JSONDatabase;
 import java.util.Scanner;
+import java.util.ArrayList;
 
 public class Main
 {
@@ -22,7 +24,10 @@ public class Main
             Integer.class, -1, new Field.IntegerFieldValidator());
 
     public static void main(String[] args) throws IllegalAccountType {
-
+        // Load banks, accounts, and transactions from JSON files
+        BankLauncher.loadBanks();
+        AccountLauncher.loadAccounts();
+        Transaction.loadTransactions();
         while (true)
         {
             showMenuHeader("Main Menu");
@@ -52,7 +57,7 @@ public class Main
                     setOption();
                     switch (getOption()) {
                         case 1 -> BankLauncher.bankLogin();
-                        case 2 -> System.out.println("Exiting Bank Operations"); // BankLauncher.showBanksMenu();
+                        case 2 -> System.out.println("Exiting Bank Operations");
                         default -> System.out.println("Invalid bank menu option.");
                     }   break;
 
@@ -61,9 +66,13 @@ public class Main
                     showMenuHeader("Create New Bank");
                     BankLauncher.createNewBank();
                     break;
-
+                // Exit
                 case 4:
                     System.out.println("Exiting. Thank you for banking!");
+                    //Saving the latest state of banks, accounts, and transactions to JSON files
+                    BankLauncher.saveBanks();
+                    AccountLauncher.saveAccounts();
+                    Transaction.saveTransactions();
                     System.exit(0);
 
                 default:

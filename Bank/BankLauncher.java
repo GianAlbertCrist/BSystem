@@ -5,6 +5,7 @@ import Main.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Objects;
+import Database.JSONDatabase;
 
 /**
  *A class primarily used for interacting with the bank module
@@ -14,7 +15,12 @@ public class BankLauncher {
     private final static ArrayList<Bank> banks = new ArrayList<>();
     //The Bank object currently logged in. Null by default, or when no bank is currently logged in.
     private static Bank loggedBank;
-
+    //The name of the file where account information is stored.
+    private static final String BANKS_FILE = "Banks.json";
+    // Static block to load banks from the JSON file when the class is loaded.
+    static {
+        loadBanks();
+    }
     /**
      * Checks if there is a currently logged-in bank session.
      *
@@ -52,6 +58,7 @@ public class BankLauncher {
      * (1) Credit Accounts, (2) Savings Accounts, (3) All, and (4) Create New Account.
      */
     private static void showAccounts() {
+        // Check if a bank is logged in
         if (loggedBank == null) {
             System.out.println("No bank logged in.");
             return;
@@ -64,7 +71,9 @@ public class BankLauncher {
         switch (Main.getOption()) {
             case 1 -> displayAccounts(CreditAccount.class);
             case 2 -> displayAccounts(SavingsAccount.class);
-            case 3 -> displayAllAccounts();
+            case 3 -> displayAccounts(StudentAccount.class);
+            case 4 -> displayAccounts(BusinessAccount.class);
+            case 5 -> displayAllAccounts();
             default -> System.out.println("Invalid option. Try again.");
         }
     }
@@ -73,6 +82,7 @@ public class BankLauncher {
      * Handles the creation of a new account within the currently logged-in bank.
      */
     private static void newAccounts() {
+        // Check if a bank is logged in
         if (loggedBank == null) {
             System.out.println("No bank logged in.");
             return;
@@ -85,14 +95,18 @@ public class BankLauncher {
         switch (Main.getOption()) {
             case 1 -> loggedBank.createNewCreditAccount();
             case 2 -> loggedBank.createNewSavingsAccount();
+            // case 3 -> loggedBank.createNewStudentAccount();
+            // case 4 -> loggedBank.createNewBusinessAccount();
             default -> System.out.println("Invalid choice.");
         }
+        saveBanks();
     }
 
     /**
      * Bank interaction when attempting to log in to the banking module using a bank user's credentials.
      */
     public static void bankLogin() {
+        // Check if there are any banks registered
         if (banks.isEmpty()) {
             System.out.println("No banks registered yet. Create a new bank first.");
             return;
@@ -162,6 +176,7 @@ public class BankLauncher {
     private static void addBank(Bank b) {
         banks.add(b);
         System.out.println("Bank successfully added: " + b.getName());
+        saveBanks();
     }
 
     /**
@@ -211,18 +226,18 @@ public class BankLauncher {
      * Creates a new bank and registers it in the system.
      */
     public static void createNewBank() {
-    
+        // Bank Name Field
         Field<String, String> bankNameField = new Field<String, String>("Bank Name", String.class, null, new Field.StringFieldValidator());
         bankNameField.setFieldValue("Enter Bank Name: ", false);
-    
+        // Validate Bank Name
         if (bankNameField.getFieldValue() == null || bankNameField.getFieldValue().isEmpty()) {
             System.out.println("Error: Bank Name is required!");
             return; // Exit early
         }
-    
+        // Bank ID Field
         Field<String, Integer> bankPasscodeField = new Field<String, Integer>("Bank Passcode", String.class, 4, new Field.StringFieldLengthValidator());
         bankPasscodeField.setFieldValue("Enter Bank Passcode: ");
-    
+        // Validate Bank Passcode
         if (bankPasscodeField.getFieldValue() == null || bankPasscodeField.getFieldValue().length() < 4) {
             System.out.println("Error: Passcode must be at least 4 characters long.");
             return; // Exit early
@@ -239,7 +254,7 @@ public class BankLauncher {
                 // Custom Limits Fields
                 Field<Double, Double> depositLimitField = new Field<Double, Double>("Deposit Limit", Double.class, 0.0, new Field.DoubleFieldValidator());
                 depositLimitField.setFieldValue("Enter Deposit Limit: ");
-    
+
                 Field<Double, Double> withdrawLimitField = new Field<Double, Double>("Withdraw Limit", Double.class, 0.0, new Field.DoubleFieldValidator());
                 withdrawLimitField.setFieldValue("Enter Withdraw Limit: ");
     
@@ -320,5 +335,27 @@ public class BankLauncher {
                 .filter(Objects::nonNull)
                 .findFirst()
                 .orElse(null);
+    }
+
+    /**
+     * Saves the list of banks to a JSON file.
+     * This method is used to persist the bank data between program executions.
+     */
+    public static void saveBanks() {
+        JSONDatabase.saveData(new ArrayList<>(banks), BANKS_FILE);
+    }
+
+
+    /**
+     * Loads the list of banks from a JSON file.
+     * This method is used to restore the bank data from a previous program execution.
+     */
+    public static void loadBanks() {
+        // Load bank data from the JSON file
+        ArrayList<Bank> loadedBanks = JSONDatabase.loadData(BANKS_FILE, Bank.class);
+        // Clear the current list of banks
+        banks.clear();
+        // Add the loaded banks to the current list
+        banks.addAll(loadedBanks);
     }
 }

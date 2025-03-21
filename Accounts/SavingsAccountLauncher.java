@@ -97,7 +97,7 @@ public class SavingsAccountLauncher {
         amountField.setFieldValue("Enter transfer amount: ");
         double amount = amountField.getFieldValue();
 
-        if (transferType == 1) { // Internal Transfer
+        if (transferType == 1) {
             Account recipient = getLoggedAccount().getBank().getBankAccount(getLoggedAccount().getBank(), recipientAccountNum);
 
             if (!(recipient instanceof SavingsAccount)) {
@@ -115,7 +115,7 @@ public class SavingsAccountLauncher {
          // External Transfer
         } else if (transferType == 2) {
             // Get recipient Bank ID instead of name
-            Field<Integer, Integer> recipientBankField = new Field<Integer, Integer>("Recipient Bank ID", Integer.class, 1, new Field.IntegerFieldValidator());
+            Field<Integer, Integer> recipientBankField = new Field<Integer, Integer>("Recipient Bank ID", Integer.class, -1, new Field.IntegerFieldValidator());
             recipientBankField.setFieldValue("Enter recipient bank ID: ");
             int recipientBankId = recipientBankField.getFieldValue();
 
