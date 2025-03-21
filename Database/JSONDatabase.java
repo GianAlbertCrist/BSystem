@@ -206,7 +206,7 @@ public class JSONDatabase {
     public static <T> void saveData(ArrayList<T> dataList, String filename) {
         JSONArray jsonArray = new JSONArray();
         for (T data : dataList) {
-            jsonArray.add((Object) dataToDict(data));
+            jsonArray.add(dataToDict(data));
         }
         save(jsonArray, filename);
     }

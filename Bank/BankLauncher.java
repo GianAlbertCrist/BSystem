@@ -16,7 +16,7 @@ public class BankLauncher {
     //The Bank object currently logged in. Null by default, or when no bank is currently logged in.
     private static Bank loggedBank;
     //The name of the file where account information is stored.
-    private static final String BANKS_FILE = "Banks.json";
+    private static final String BANKS_FILE = "Database/Banks.json";
     // Static block to load banks from the JSON file when the class is loaded.
     static {
         loadBanks();
@@ -248,7 +248,7 @@ public class BankLauncher {
         boolean ans = true;
         while (ans) {
             // Ask user if they want to set custom limits
-            String choice = Main.prompt("Do you want to set custom deposit, withdrawal, credit limits and proccessing fee? (Y/N):", true).trim().toUpperCase();
+            String choice = Main.prompt("Do you want to set custom deposit, withdrawal, credit limits and processing fee? (Y/N):", true).trim().toUpperCase();
     
             if (choice.equals("Y")) {
                 // Custom Limits Fields
@@ -302,11 +302,7 @@ public class BankLauncher {
             System.out.println("Bank created successfully: " + newBank);
             addBank(newBank);
         } else {
-            if (newBank != null) {
-                System.out.printf("Bank %s already exists!\n", newBank.getName());
-            } else {
-                System.out.println("Error: Bank creation failed.");
-            }
+            System.out.printf("Bank %s already exists!\n", newBank.getName());
         }
     }
 

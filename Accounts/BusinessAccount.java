@@ -24,12 +24,21 @@ public class BusinessAccount extends Account implements Deposit, Withdrawal, Fun
         this.businessBalance = initialDeposit;
     }
 
+    //Getters
+    public double getBusinessBalance() {
+        return businessBalance;
+    }
+
+    public double getBankAnnualIncome() {
+        return bankAnnualIncome;
+    }
+
     public String getBusinessPermitID() {
-        return this.businessPermitID;
+        return businessPermitID;
     }
 
     public String getBusinessName() {
-        return this.businessName;
+        return businessName;
     }
 
     public boolean hasEnoughBalance(double amount) {
@@ -92,7 +101,7 @@ public class BusinessAccount extends Account implements Deposit, Withdrawal, Fun
     @Override
     public boolean transfer(Bank bank, Account account, double amount) throws IllegalAccountType {
         if (!(account instanceof BusinessAccount)) {
-            throw new IllegalAccountType("Can only tranfer funds to a Business account.");
+            throw new IllegalAccountType("Can only transfer funds to a Business account.");
         }
 
         if (!hasEnoughBalance(amount) || amount <= 0 || amount > getBank().getWithdrawLimit()) {

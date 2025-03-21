@@ -36,6 +36,19 @@ public class StudentAccount extends Account implements Deposit, Withdrawal {
         }
     }
 
+    //Getters
+    public double getSavingsBalance() {
+        return savingsBalance;
+    }
+
+    public int getYearOfBirth() {
+        return yearOfBirth;
+    }
+
+    public String getStudentId() {
+        return studentId;
+    }
+
     /**
      * Check if the account holder is eligible for a student account based on age (18-25).
      *

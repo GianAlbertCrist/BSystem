@@ -37,7 +37,7 @@ public class Transaction {
 
     private final LocalDateTime timestamp;
 
-    private static final String TRANSACTIONS_FILE = "Transactions.json";
+    private static final String TRANSACTIONS_FILE = "Database/Transactions.json";
 
     private static final ArrayList<Transaction> transactions = new ArrayList<>();
 

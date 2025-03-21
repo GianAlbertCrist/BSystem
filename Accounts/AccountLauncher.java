@@ -15,7 +15,7 @@ public class AccountLauncher {
     //Selected associated bank when attempting to log in in the account module.
     private static Bank assocBank;
     //The name of the file where account information is stored.
-    private static final String ACCOUNTS_FILE = "Accounts.json";
+    private static final String ACCOUNTS_FILE = "Database/Accounts.json";
 
     // Static block to load accounts from the JSON file when the class is loaded.
     static {

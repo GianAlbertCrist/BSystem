@@ -4,9 +4,7 @@ import Accounts.AccountLauncher;
 import Processes.IllegalAccountType;
 import Processes.Transaction;
 import Bank.*;
-import Database.JSONDatabase;
 import java.util.Scanner;
-import java.util.ArrayList;
 
 public class Main
 {
