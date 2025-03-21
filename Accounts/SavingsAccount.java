@@ -2,6 +2,7 @@ package Accounts;
 
 import Bank.Bank;
 import Processes.*;
+import Processes.TransactionManager;
 
 /**
  * SavingsAccount class representing a standard savings account with balance tracking.
@@ -10,6 +11,7 @@ import Processes.*;
 public class SavingsAccount extends Account implements Withdrawal, Deposit, FundTransfer {
     // The current balance of the savings account
     private double balance;
+    private TransactionManager transactionManager = new TransactionManager();
 
     /**
      * Constructor for SavingsAccount.
