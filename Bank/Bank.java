@@ -1,11 +1,7 @@
 package Bank;
 
-import Accounts.Account;
-import Accounts.AccountLauncher;
-import Accounts.CreditAccount;
-import Accounts.SavingsAccount;
-import Main.Field;
-import Main.Main;
+import Accounts.*;
+import Main.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 
@@ -130,6 +126,48 @@ public class Bank {
             accountFields.add(field);
         }
         return accountFields;
+    }
+
+    public void createNewStudentAccount() {
+        String accountNumber = Main.prompt("Enter Account Number: ", false);
+        String pin = Main.prompt("Enter PIN: ", false);
+        String ownerFname = Main.prompt("Enter First Name: ", false);
+        String ownerLname = Main.prompt("Enter Last Name: ", false);
+        String ownerEmail = Main.prompt("Enter Email: ", false);
+        int yearOfBirth = Integer.parseInt(Main.prompt("Enter Year of Birth: ", false));
+        String studentId = Main.prompt("Enter Student ID: ", false);
+
+        try {
+            StudentAccount tempAccount = new StudentAccount(this, accountNumber, pin, ownerFname, ownerLname, ownerEmail, yearOfBirth, studentId);
+            if (!tempAccount.isEligibleForStudentAccount()) {
+                System.out.println("Error: Age must be between 18 and 25 to create a Student Account.");
+                return;
+            }
+            bankAccounts.add(tempAccount);
+            System.out.println("Student Account successfully registered.");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
+    public void createNewBusinessAccount() {
+        String accountNumber = Main.prompt("Enter Account Number: ", false);
+        String pin = Main.prompt("Enter PIN: ", false);
+        String ownerFname = Main.prompt("Enter First Name: ", false);
+        String ownerLname = Main.prompt("Enter Last Name: ", false);
+        String ownerEmail = Main.prompt("Enter Email: ", false);
+        String businessPermitID = Main.prompt("Enter Business Permit ID: ", false);
+        String businessName = Main.prompt("Enter Business Name: ", false);
+        double bankAnnualIncome = Double.parseDouble(Main.prompt("Enter Bank Annual Income: ", false));
+        double initialDeposit = Double.parseDouble(Main.prompt("Enter Initial Deposit: ", false));
+
+        try {
+            BusinessAccount newAccount = new BusinessAccount(this, accountNumber, pin, ownerFname, ownerLname, ownerEmail, businessPermitID, businessName, bankAnnualIncome, initialDeposit);
+            bankAccounts.add(newAccount);
+            System.out.println("Business Account successfully registered.");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
     }
 
     /**

@@ -2,26 +2,24 @@ package Accounts;
 
 import Bank.*;
 import Main.*;
+import Processes.FundTransfer;
 import Processes.IllegalAccountType;
 
-/**
- * Savings Account Launcher class for handling savings account operations
- */
-public class SavingsAccountLauncher {
+public class StudentAccountLauncher extends AccountLauncher {
 
     /**
-     * Method that deals with all things about savings accounts.
-     * Mainly utilized for showing the main menu after Savings Account users log in to the application.
+     * Method that deals with all things about student accounts.
+     * Mainly utilized for showing the main menu after Student Account users log in to the application.
      */
-    public static void savingsAccountInit() throws IllegalAccountType {
+    public static void studentAccountInit() throws IllegalAccountType {
         if (getLoggedAccount() == null) {
             System.out.println("No account logged in.");
             return;
         }
 
         while (true) {
-            Main.showMenuHeader("Savings Account Menu");
-            Main.showMenu(51);
+            Main.showMenuHeader("Student Account Menu");
+            Main.showMenu(52);
             Main.setOption();
 
             switch (Main.getOption()) {
@@ -97,13 +95,13 @@ public class SavingsAccountLauncher {
         if (transferType == 1) {
             Account recipient = getLoggedAccount().getBank().getBankAccount(getLoggedAccount().getBank(), recipientAccountNum);
 
-            if (!(recipient instanceof SavingsAccount)) {
+            if (!(recipient instanceof SavingsAccount || recipient instanceof StudentAccount)) {
                 throw new IllegalAccountType("Cannot transfer funds to a CreditAccount.");
             }
 
             if (recipientAccountNum.equals(getLoggedAccount().getAccountNumber())) {
                 System.out.println("Warning: You are transferring to your own account. Transfer failed.");
-            } else if (getLoggedAccount().transfer(recipient, amount)) {
+            } else if (((StudentAccount) getLoggedAccount()).transfer((StudentAccount) recipient, amount)) {
                 System.out.println("Internal transfer successful.");
             } else {
                 System.out.println("Transfer failed. Insufficient funds or limit exceeded.");
@@ -112,7 +110,7 @@ public class SavingsAccountLauncher {
          // External Transfer
         } else if (transferType == 2) {
             // Get recipient Bank ID instead of name
-            Field<Integer, Integer> recipientBankField = new Field<Integer, Integer>("Recipient Bank ID", Integer.class, -1, new Field.IntegerFieldValidator());
+            Field<Integer, Integer> recipientBankField = new Field<>("Recipient Bank ID", Integer.class, -1, new Field.IntegerFieldValidator());
             recipientBankField.setFieldValue("Enter recipient bank ID: ");
             int recipientBankId = recipientBankField.getFieldValue();
 
@@ -131,12 +129,17 @@ public class SavingsAccountLauncher {
 
             Account recipient = recipientBank.getBankAccount(recipientBank, recipientAccountNum);
 
-            if (!(recipient instanceof SavingsAccount)) {
-                System.out.println("Recipient account not found or is not a Savings Account.");
+            if (!(recipient instanceof SavingsAccount || recipient instanceof StudentAccount)) {
+                System.out.println("Recipient account not found or is not a Savings/Student Account.");
                 return;
             }
 
-            if (getLoggedAccount().transfer(recipientBank, recipient, amount)) {
+            if (recipientAccountNum.equals(getLoggedAccount().getAccountNumber())) {
+                System.out.println("Warning: You are transferring to your own account. Transfer failed.");
+            } else if (((StudentAccount) getLoggedAccount()).transfer((StudentAccount) recipient, amount)) {
+                System.out.println("External transfer successful. Processing fee of Php" +
+                        getLoggedAccount().getBank().getProcessingFee() + " applied.");
+            } else if ((SavingsAccountLauncher.getLoggedAccount()).transfer((SavingsAccount) recipient, amount)) {
                 System.out.println("External transfer successful. Processing fee of Php" +
                         getLoggedAccount().getBank().getProcessingFee() + " applied.");
             } else {
@@ -149,21 +152,21 @@ public class SavingsAccountLauncher {
     }
 
     /**
-     * Get the Savings Account instance of the currently logged account.
+     * Get the Student Account instance of the currently logged account.
      *
-     * @return SavingsAccount object
+     * @return StudentAccount object
      */
-    protected static SavingsAccount getLoggedAccount() {
+    protected static StudentAccount getLoggedAccount() {
         Account account = AccountLauncher.getLoggedAccount();
         if (account == null) {
             System.out.println("No logged-in account.");
             return null;
         }
 
-        if (account instanceof SavingsAccount savingsAccount) {
-            return savingsAccount;
+        if (account instanceof StudentAccount studentAccount) {
+            return studentAccount;
         } else {
-            System.out.println("No logged-in savings account found.");
+            System.out.println("No logged-in student account found.");
             return null;
         }
     }

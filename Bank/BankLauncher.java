@@ -95,8 +95,8 @@ public class BankLauncher {
         switch (Main.getOption()) {
             case 1 -> loggedBank.createNewCreditAccount();
             case 2 -> loggedBank.createNewSavingsAccount();
-            // case 3 -> loggedBank.createNewStudentAccount();
-            // case 4 -> loggedBank.createNewBusinessAccount();
+            case 3 -> loggedBank.createNewStudentAccount();
+            case 4 -> loggedBank.createNewBusinessAccount();
             default -> System.out.println("Invalid choice.");
         }
         saveBanks();

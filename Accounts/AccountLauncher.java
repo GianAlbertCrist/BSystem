@@ -110,10 +110,10 @@ public class AccountLauncher {
             SavingsAccountLauncher.savingsAccountInit();
         } else if (accountType == StudentAccount.class && loggedAccount instanceof  StudentAccount) {
             System.out.println(greet);
-//            StudentAccountLauncher.studentAccountInit();
+            StudentAccountLauncher.studentAccountInit();
         } else if (accountType == BusinessAccount.class && loggedAccount instanceof BusinessAccount) {
             System.out.println(greet);
-//            BusinessAccountLauncher.BusinessAccountInit();
+            BusinessAccountLauncher.BusinessAccountInit();
         } else {
             System.out.println("Invalid account type. Returning to main menu.");
             destroyLogSession();
