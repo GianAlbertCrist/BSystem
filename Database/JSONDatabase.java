@@ -8,6 +8,7 @@ import org.json.simple.parser.ParseException;
 import Accounts.Account;
 import Bank.Bank;
 import Bank.BankLauncher;
+import Processes.*;
 
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -59,7 +60,7 @@ public class JSONDatabase {
             LOGGER.log(Level.SEVERE, "Error saving JSON file", e);
         }
     }
-
+    @SuppressWarnings("unchecked")
     public static JSONObject dataToDict(Object data) {
         JSONObject jsonObject = new JSONObject();
         if (data instanceof Bank bank) {
@@ -91,13 +92,15 @@ public class JSONDatabase {
             jsonObject.put("transactions", transactionsArray);
             
         } else if (data instanceof Transaction transaction) {
-            jsonObject.put("accountNum", transaction.getAccountNum());
-            jsonObject.put("type", transaction.getType().toString());
-            jsonObject.put("description", transaction.getDescription());
+            jsonObject.put("accountNum", transaction.accountNumber);
+            jsonObject.put("type", transaction.transactionType);
+            jsonObject.put("description", transaction.description);
+            jsonObject.put("time", transaction.getTimestamp());
         }
         return jsonObject;
     }
 
+    @SuppressWarnings("unchecked")
     public static Object dataFromDict(JSONObject jsonObject, Class<?> clazz) {
         if (clazz == Bank.class) {
             int bankId = ((Long) jsonObject.get("bankId")).intValue();
@@ -114,6 +117,7 @@ public class JSONDatabase {
             for (Object obj : accountsArray) {
                 JSONObject accountObject = (JSONObject) obj;
                 Account account = (Account) dataFromDict(accountObject, Account.class);
+                assert account != null;
                 bank.addNewAccount(account);
             }
             return bank;
@@ -125,14 +129,15 @@ public class JSONDatabase {
             String ownerEmail = (String) jsonObject.get("ownerEmail");
             String pin = (String) jsonObject.get("pin");
 
-            Bank bank = BankLauncher.findAccount(accountNumber);
+            Bank bank = BankLauncher.findAccount(accountNumber).getBank();
             Account account = new Account(bank, accountNumber, pin, ownerFname, ownerLname, ownerEmail) {};
 
             JSONArray transactionsArray = (JSONArray) jsonObject.get("transactions");
             for (Object obj : transactionsArray) {
                 JSONObject transactionObject = (JSONObject) obj;
                 Transaction transaction = (Transaction) dataFromDict(transactionObject, Transaction.class);
-                account.addNewTransaction(transaction.getAccountNum(), transaction.getType(), transaction.getDescription());
+                assert transaction != null;
+                account.addNewTransaction(transaction.accountNumber, transaction.transactionType, transaction.description);
             }
             return account;
 
@@ -145,21 +150,22 @@ public class JSONDatabase {
         return null;
     }
 
-    public static ArrayList<Object> loadData(String filename, Class<?> clazz) {
+    public static <T> ArrayList<T> loadDax`ta(String filename, Class<T> clazz) {
         JSONArray jsonArray = load(filename);
-        ArrayList<Object> dataList = new ArrayList<>();
+        ArrayList<T> dataList = new ArrayList<>();
         for (Object obj : jsonArray) {
             JSONObject jsonObject = (JSONObject) obj;
-            dataList.add(dataFromDict(jsonObject, clazz));
+            dataList.add(clazz.cast(dataFromDict(jsonObject, clazz))); // Type-safe cast
         }
         return dataList;
     }
 
-    public static void saveData(ArrayList<Object> dataList, String filename) {
-        JSONArray jsonArray = new JSONArray();
-        for (Object data : dataList) {
-            jsonArray.add(dataToDict(data));
+    @SuppressWarnings("unchecked")
+    public static <T> void saveData(ArrayList<T> dataList, String filename) {
+        JSONArray jsonArray = new JSONArray(); // Correct way to use JSONArray
+        for (T data : dataList) {
+            jsonArray.add((Object) dataToDict(data));
         }
-        save(jsonArray, filename);
+        save(jsonArray, filename); // No need for casting
     }
 }
