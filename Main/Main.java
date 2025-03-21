@@ -40,12 +40,6 @@ public class Main
                     if (getOption() == 1) {
                         Bank selectedBank = AccountLauncher.selectBank();
                         
-                        if (selectedBank == null) {
-                            showMenuHeader("Create New Bank");
-                            BankLauncher.createNewBank();
-                            break;
-                        }
-                        
                         AccountLauncher accountLauncher = new AccountLauncher();
                         accountLauncher.setAssocBank(selectedBank);
                         accountLauncher.accountLogin();

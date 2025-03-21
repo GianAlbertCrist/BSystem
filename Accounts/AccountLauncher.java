@@ -38,7 +38,7 @@ public class AccountLauncher {
      */
     public void accountLogin() throws IllegalAccountType {
         if (assocBank == null) {
-            System.out.println("Bank selection failed. Please try again.");
+            System.out.println("Bank selection failed.");
             return;
         }
 
@@ -59,15 +59,12 @@ public class AccountLauncher {
         Class<? extends Account> accountType;
         
         switch (Main.getOption()) {
-            case 1:
-                accountType = CreditAccount.class;
-                break;
-            case 2:
-                accountType = SavingsAccount.class;
-                break;
-            default:
+            case 1 -> accountType = CreditAccount.class;
+            case 2 -> accountType = SavingsAccount.class;
+            default -> {
                 System.out.println("Invalid option. Returning to main menu.");
                 return;
+            }
         }
 
         // Prompt user for account number and PIN
@@ -114,24 +111,38 @@ public class AccountLauncher {
             System.out.println("No banks are available. Please create a bank first.");
             return null;
         }
-
-        Main.showMenuHeader("Select a Bank");
-        BankLauncher.showBanksMenu();
-
-        Field <Integer, Integer> bankidField = new Field<Integer, Integer>("Bank ID", Integer.class, 0, new Field.IntegerFieldValidator());
-        bankidField.setFieldValue("Enter Bank ID: ");
-
-        Field <String, String> bankNameField = new Field<String, String>("Bank Name", String.class, null, new Field.StringFieldValidator());
-        bankNameField.setFieldValue("Enter Bank Name: ");
-
-        for (Bank bank : BankLauncher.getBanks()) {
+        
+        boolean on = true;
+        while (on) {
+            Main.showMenuHeader("Select a Bank");
+            BankLauncher.showBanksMenu();
+        
+            Field<Integer, Integer> bankidField = new Field<>("Bank ID", Integer.class, 0, new Field.IntegerFieldValidator());
+            bankidField.setFieldValue("Enter Bank ID: ");
+        
+            Field<String, String> bankNameField = new Field<>("Bank Name", String.class, null, new Field.StringFieldValidator());
+            bankNameField.setFieldValue("Enter Bank Name: ");
+        
+            for (Bank bank : BankLauncher.getBanks()) {
             if (bank.getBankId() == bankidField.getFieldValue() && bank.getName().equals(bankNameField.getFieldValue())) {
                 System.out.println("Bank selected: " + bank.getName());
                 return bank;
             }
+            }
+            System.out.println("Bank does not exist. Please try again");
+            
+            // Prompt user to continue or exit
+            String userInput = Main.prompt("Do you want to try again? (Y/N): ", true).trim().toUpperCase();
+            switch (userInput) {
+                case "Y" -> {continue;}
+                case "N" -> {return null;}
+                default -> {
+                    System.out.println("Invalid input. Returning to main menu.");
+                    on = false;
+                }
+            }
         }
-        System.out.println("Bank does not exist.");
-        return null; 
+        return null;
     }
 
     /**
