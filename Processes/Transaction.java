@@ -2,6 +2,8 @@ package Processes;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import Database.JSONDatabase;
+import java.util.ArrayList;
 
 /**
  * The Transaction class records details of a specific account transaction.
@@ -35,12 +37,30 @@ public class Transaction {
 
     private final LocalDateTime timestamp;
 
+    private static final String TRANSACTIONS_FILE = "Database/Transactions.json";
+
+    private static final ArrayList<Transaction> transactions = new ArrayList<>();
+
     public Transaction(String accountNumber, Transactions transactionType, String description) {
         this.accountNumber = accountNumber;
         this.transactionType = transactionType;
         this.description = description;
         this.timestamp = LocalDateTime.now();
+        registerTransaction();
+        }
+
+    public Transaction(String accountNumber, Transactions transactionType, String description, LocalDateTime timestamp) {
+        this.accountNumber = accountNumber;
+        this.transactionType = transactionType;
+        this.description = description;
+        this.timestamp = timestamp;
+        registerTransaction();
     }
+
+    private void registerTransaction() {
+        transactions.add(this);
+        saveTransactions();
+}
 
     /**
      * Retrieves the timestamp when this transaction occurred.
@@ -61,5 +81,15 @@ public class Transaction {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         return String.format("Transaction{Time: %s, Source: %s, Type: %s, Description: %s}",
                 getTimestamp().format(formatter), accountNumber, transactionType, description);
+    }
+
+    public static void saveTransactions() {
+        JSONDatabase.saveData(transactions, TRANSACTIONS_FILE);
+    }
+
+    public static void loadTransactions() {
+        ArrayList<Transaction> loadedTransactions = JSONDatabase.loadData(TRANSACTIONS_FILE, Transaction.class);
+        transactions.clear();
+        transactions.addAll(loadedTransactions);
     }
 }

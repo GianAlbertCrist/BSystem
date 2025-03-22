@@ -4,24 +4,17 @@ import Bank.*;
 import Main.*;
 import Processes.IllegalAccountType;
 
-/**
- * Savings Account Launcher class for handling savings account operations
- */
-public class SavingsAccountLauncher {
+public class BusinessAccountLauncher extends AccountLauncher {
 
-    /**
-     * Method that deals with all things about savings accounts.
-     * Mainly utilized for showing the main menu after Savings Account users log in to the application.
-     */
-    public static void savingsAccountInit() throws IllegalAccountType {
+    public static void BusinessAccountInit () throws IllegalAccountType {
         if (getLoggedAccount() == null) {
             System.out.println("No account logged in.");
             return;
         }
 
         while (true) {
-            Main.showMenuHeader("Savings Account Menu");
-            Main.showMenu(51);
+            Main.showMenuHeader("Business Account Menu");
+            Main.showMenu(61);
             Main.setOption();
 
             switch (Main.getOption()) {
@@ -38,9 +31,6 @@ public class SavingsAccountLauncher {
         }
     }
 
-    /**
-     * A method that deals with the deposit process transaction.
-     */
     private static void depositProcess() {
         Field<Double, Double> amountField = new Field<Double, Double>("Deposit Amount", Double.class, 1.0, new Field.DoubleFieldValidator());
         amountField.setFieldValue("Enter deposit amount: ");
@@ -53,9 +43,6 @@ public class SavingsAccountLauncher {
         }
     }
 
-    /**
-     * A method that deals with the withdrawal process transaction.
-     */
     private static void withdrawProcess() {
         Field<Double, Double> amountField = new Field<Double, Double>("Withdrawal Amount", Double.class, 1.0, new Field.DoubleFieldValidator());
         amountField.setFieldValue("Enter withdrawal amount: ");
@@ -68,9 +55,6 @@ public class SavingsAccountLauncher {
         }
     }
 
-    /**
-     * A method that deals with the fund transfer process transaction.
-     */
     private static void fundTransfer() throws IllegalAccountType {
         if (getLoggedAccount() == null) {
             System.out.println("No account logged in.");
@@ -97,13 +81,13 @@ public class SavingsAccountLauncher {
         if (transferType == 1) {
             Account recipient = getLoggedAccount().getBank().getBankAccount(getLoggedAccount().getBank(), recipientAccountNum);
 
-            if (!(recipient instanceof SavingsAccount)) {
-                throw new IllegalAccountType("Cannot transfer funds to a CreditAccount.");
+            if (!(recipient instanceof BusinessAccount)) {
+                throw new IllegalAccountType("Cannot transfer funds to other Accounts other than a Business Account.");
             }
 
             if (recipientAccountNum.equals(getLoggedAccount().getAccountNumber())) {
                 System.out.println("Warning: You are transferring to your own account. Transfer failed.");
-            } else if (getLoggedAccount().transfer(recipient, amount)) {
+            } else if (((BusinessAccount) getLoggedAccount()).transfer(recipient, amount)) {
                 System.out.println("Internal transfer successful.");
             } else {
                 System.out.println("Transfer failed. Insufficient funds or limit exceeded.");
@@ -131,12 +115,12 @@ public class SavingsAccountLauncher {
 
             Account recipient = recipientBank.getBankAccount(recipientBank, recipientAccountNum);
 
-            if (!(recipient instanceof SavingsAccount)) {
-                System.out.println("Recipient account not found or is not a Savings Account.");
+            if (!(recipient instanceof BusinessAccount)) {
+                System.out.println("Recipient account not found or is not a Savings Account or in Credit Account.");
                 return;
             }
 
-            if (getLoggedAccount().transfer(recipientBank, recipient, amount)) {
+            if (((BusinessAccount) getLoggedAccount()).transfer(recipientBank, recipient, amount)) {
                 System.out.println("External transfer successful. Processing fee of Php" +
                         getLoggedAccount().getBank().getProcessingFee() + " applied.");
             } else {
@@ -148,23 +132,19 @@ public class SavingsAccountLauncher {
         }
     }
 
-    /**
-     * Get the Savings Account instance of the currently logged account.
-     *
-     * @return SavingsAccount object
-     */
-    protected static SavingsAccount getLoggedAccount() {
+    protected static BusinessAccount getLoggedAccount() {
         Account account = AccountLauncher.getLoggedAccount();
         if (account == null) {
             System.out.println("No logged-in account.");
             return null;
         }
 
-        if (account instanceof SavingsAccount savingsAccount) {
-            return savingsAccount;
+        if (account instanceof BusinessAccount BusinessAccount) {
+            return BusinessAccount;
         } else {
-            System.out.println("No logged-in savings account found.");
+            System.out.println("No logged-in business account found.");
             return null;
         }
     }
+    
 }

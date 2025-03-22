@@ -5,7 +5,7 @@ import Processes.Deposit;
 import Processes.Withdrawal;
 import Processes.TransactionManager;
 
-public class StudentAccount extends Account implements Deposit, Withdrawal {
+public final class StudentAccount extends Account implements Deposit, Withdrawal {
 
     private double savingsBalance;
     private final int yearOfBirth;  // To calculate age for eligibility
@@ -36,14 +36,27 @@ public class StudentAccount extends Account implements Deposit, Withdrawal {
         }
     }
 
+    //Getters
+    public double getSavingsBalance() {
+        return savingsBalance;
+    }
+
+    public int getYearOfBirth() {
+        return yearOfBirth;
+    }
+
+    public String getStudentId() {
+        return studentId;
+    }
+
     /**
      * Check if the account holder is eligible for a student account based on age (18-25).
      *
      * @return true if eligible, false otherwise.
      */
-    private boolean isEligibleForStudentAccount() {
+    public boolean isEligibleForStudentAccount() {
         int currentYear = java.time.Year.now().getValue();
-        int age = currentYear - yearOfBirth;
+        int age = currentYear - this.yearOfBirth;
         return age >= 18 && age <= 25;
     }
 
@@ -112,8 +125,43 @@ public class StudentAccount extends Account implements Deposit, Withdrawal {
      * @return a string representing the account balance .
      */
     public String getAccountBalanceStatement() {
-        return String.format("StudentAccount{Account Number: %s, Owner: %s, Balance: Php %.2f, Has Perks: %b}",
+        return String.format("StudentAccount{Account Number: %s, Owner: %s, Balance: Php %.2f",
                 this.getAccountNumber(), getOwnerFullName(), this.savingsBalance);
+    }
+
+    /**
+     * Transfers an amount of money from this account to another student account.
+     * Cannot proceed if one of the following is true:
+     * <ul>
+     *     <li>Insufficient balance from source account.</li>
+     *     <li>Recipient account does not exist.</li>
+     *     <li>Recipient account is from another bank.</li>
+     * </ul>
+     * @param account – Account number of recipient
+     * @param amount – Amount of money to be supposedly adjusted from this account’s balance.
+     * @return Flag if fund transfer transaction is successful or not.
+     */
+    public boolean transfer(StudentAccount account, double amount) {
+        if (!isEligibleForStudentAccount()) {
+            throw new IllegalArgumentException("Account holder must be between 18 and 25 years old.");
+        }
+
+        if (amount <= 0 || amount > this.savingsBalance || amount > getBank().getWithdrawLimit()) {
+            insufficientBalance();
+            return false;
+        }
+
+        // Deduct from sender and add to recipient
+        adjustAccountBalance(-amount);
+        account.adjustAccountBalance(amount);
+
+        // Log transactions for both accounts
+        addNewTransaction(account.getAccountNumber(), Transaction.Transactions.FundTransfer,
+                String.format("Transferred Php %.2f to %s", amount, account.getAccountNumber()));
+        account.addNewTransaction(getAccountNumber(), Transaction.Transactions.ReceiveTransfer,
+                String.format("Received Php %.2f from %s", amount, getAccountNumber()));
+
+        return true;
     }
 
     public double getAccountBalance() {
