@@ -3,9 +3,8 @@ package Accounts;
 import Bank.Bank;
 import Processes.Deposit;
 import Processes.IllegalAccountType;
-import Processes.Withdrawal;
 import Processes.TransactionManager;
-import Processes.Transaction;
+import Processes.Withdrawal;
 
 public final class StudentAccount extends Account implements Deposit, Withdrawal {
 

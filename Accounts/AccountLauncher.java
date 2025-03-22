@@ -17,12 +17,7 @@ public class AccountLauncher {
     //The name of the file where account information is stored.
     private static final String ACCOUNTS_FILE = "Database/Accounts.json";
 
-    // Static block to load accounts from the JSON file when the class is loaded.
-    static {
-        loadAccounts();
-    }
-
-    public void setAssocBank(Bank assocBank) {
+    public static void setAssocBank(Bank assocBank) {
         AccountLauncher.assocBank = assocBank;
     }
 
@@ -79,6 +74,8 @@ public class AccountLauncher {
             }
         }
 
+        showAccountMenu(accountType);
+
         // Prompt user for account number and PIN
         Field<String, Integer> accountField = new Field<String, Integer>("Account Number", String.class, 5, new Field.StringFieldLengthValidator());
         accountField.setFieldValue("Enter Account Number: ");
@@ -120,6 +117,24 @@ public class AccountLauncher {
             return;
         }
         destroyLogSession();
+    }
+
+    /**
+     * Output a menu of all accounts associated with the logged-in user.
+     * @param accountType The type of account to display (null for all accounts).
+     */
+    public static void showAccountMenu(Class<? extends Account> accountType) {
+        System.out.println("\nAccount Details:");
+        System.out.printf("%-3s | %-50s%n", "#", "List of Account");
+        System.out.println("--------------------------------------------------------------------------------------------------------");
+    
+        int count = 1;
+        for (Account account : assocBank.getBankAccounts()) {
+            if (accountType == null || accountType.isInstance(account)) {
+                System.out.printf("%-3d | %-50s%n", 
+                count++, account.toString());
+            }
+        }
     }
 
     /**
@@ -211,14 +226,14 @@ public class AccountLauncher {
      * and then saves them to a JSON file using the JSONDatabase class.
      */
     public static void saveAccounts() {
-        ArrayList<Account> allAccounts = new ArrayList<>();
+        ArrayList<Account> data = new ArrayList<>();
         // Iterate through all banks
         for (Bank bank : BankLauncher.getBanks()) {
             // Add all accounts from the current bank to the list
-            allAccounts.addAll(bank.getBankAccounts());
+            data.addAll(bank.getBankAccounts());
         }
         // Save the list of accounts to a JSON file
-        JSONDatabase.saveData(allAccounts, ACCOUNTS_FILE);
+        JSONDatabase.saveData(data, ACCOUNTS_FILE);
     }
 
     /**

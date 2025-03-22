@@ -68,22 +68,14 @@ public class Bank {
         // If no account type specified, show all accounts in the bank.
         if (accountType == null) {
             System.out.println("Showing all accounts:");
-            int count = 1;
-            for (Account account : bankAccounts) {
-                System.out.println(count + ".) " + account);
-                count++;
-            }
+            AccountLauncher.showAccountMenu(accountType);
+        
         } else { // accountType specified, show only accounts of that type
-            boolean hasAccounts = false;
-            int count = 1;
-            for (Account account : bankAccounts) {
-                if (accountType.isInstance(account)) {
-                    System.out.println(count + ".) " + account);
-                    hasAccounts = true;
-                    count++;
-                }
-            }
-            if (!hasAccounts) {
+            boolean hasAccounts = bankAccounts.stream().anyMatch(accountType::isInstance);
+            if (hasAccounts) {
+                System.out.println("Showing all existing " + accountType.getSimpleName() + " accounts:");
+                AccountLauncher.showAccountMenu(accountType);
+            } else {
                 System.out.println("No " + accountType.getSimpleName() + " accounts have been created.");
             }
         }
@@ -223,7 +215,6 @@ public class Bank {
         }
         // Add the account to the bank
         bankAccounts.add(account);
-        AccountLauncher.saveAccounts();
         System.out.println(account);
         System.out.println("Account successfully registered.");
     }

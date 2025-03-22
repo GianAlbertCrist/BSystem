@@ -7,91 +7,47 @@
     "withdrawLimit": 50000.0,
     "accounts": [
       {
+        "bankId": 0,
         "pin": "1111",
-        "ownerFname": "Gian",
+        "accountType": "CreditAccount",
+        "ownerFname": "g",
         "accountNumber": "00001",
-        "transactions": [
-          {
-            "accountNum": "00002",
-            "description": "Paid Php 1500.00 to 00002",
-            "time": "2025-03-22T02:09:34.090507800",
-            "type": "Payment"
-          },
-          {
-            "accountNum": "00001",
-            "description": "Recompensed Php 1000.0 to the bank.",
-            "time": "2025-03-22T02:09:45.213088300",
-            "type": "Recompense"
-          }
-        ],
-        "ownerLname": "Daytic",
-        "ownerEmail": "giandaytic69@gmail.com"
+        "transactions": [],
+        "ownerLname": "d",
+        "ownerEmail": "fd"
       },
       {
+        "bankId": 0,
         "pin": "2222",
-        "ownerFname": "Gilbert",
+        "accountType": "SavingsAccount",
+        "ownerFname": "rr",
         "accountNumber": "00002",
-        "transactions": [
-          {
-            "accountNum": "00003",
-            "description": "Transferred Php 400.00 to 00003",
-            "time": "2025-03-22T02:08:53.732336800",
-            "type": "FundTransfer"
-          },
-          {
-            "accountNum": "00001",
-            "description": "Received Php 1500.00 from Credit Account 00001",
-            "time": "2025-03-22T02:09:34.093272",
-            "type": "ReceiveTransfer"
-          }
-        ],
-        "ownerLname": "Daytic",
-        "ownerEmail": "gilbertdaytic22@gmail.com"
+        "transactions": [],
+        "ownerLname": "rrr",
+        "ownerEmail": "rrrr"
       },
       {
+        "bankId": 0,
         "pin": "3333",
-        "ownerFname": "Maynard",
+        "accountType": "StudentAccount",
+        "ownerFname": "a",
         "accountNumber": "00003",
-        "transactions": [
-          {
-            "accountNum": "00002",
-            "description": "Received Php 400.00 from 00002",
-            "time": "2025-03-22T02:08:54.200904300",
-            "type": "ReceiveTransfer"
-          }
-        ],
-        "ownerLname": "Piit",
-        "ownerEmail": "maynardpiit11@gmail.com"
+        "transactions": [],
+        "ownerLname": "s",
+        "ownerEmail": "as"
+      },
+      {
+        "bankId": 0,
+        "pin": "4444",
+        "accountType": "BusinessAccount",
+        "ownerFname": "g",
+        "accountNumber": "00004",
+        "transactions": [],
+        "ownerLname": "t",
+        "ownerEmail": "gtg"
       }
     ],
     "passcode": "1234",
-    "processingFee": 10.0
-  },
-  {
-    "bankId": 1,
-    "depositLimit": 50000.0,
-    "creditLimit": 100000.0,
-    "bankName": "BPI",
-    "withdrawLimit": 50000.0,
-    "accounts": [
-      {
-        "pin": "1111",
-        "ownerFname": "Luck",
-        "accountNumber": "00001",
-        "transactions": [],
-        "ownerLname": "Me",
-        "ownerEmail": "luckme12@gmail.com"
-      },
-      {
-        "pin": "4444",
-        "ownerFname": "Jane",
-        "accountNumber": "00004",
-        "transactions": [],
-        "ownerLname": "Julis",
-        "ownerEmail": "janejulis99@gmail.com"
-      }
-    ],
-    "passcode": "4321",
     "processingFee": 10.0
   }
 ]

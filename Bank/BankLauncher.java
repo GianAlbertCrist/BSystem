@@ -17,10 +17,7 @@ public class BankLauncher {
     private static Bank loggedBank;
     //The name of the file where account information is stored.
     private static final String BANKS_FILE = "Database/Banks.json";
-    // Static block to load banks from the JSON file when the class is loaded.
-    static {
-        loadBanks();
-    }
+
     /**
      * Checks if there is a currently logged-in bank session.
      *
@@ -99,7 +96,6 @@ public class BankLauncher {
             case 4 -> loggedBank.createNewBusinessAccount();
             default -> System.out.println("Invalid choice.");
         }
-        saveBanks();
     }
 
     /**
@@ -115,8 +111,10 @@ public class BankLauncher {
         // Show available banks
         showBanksMenu();
 
-        // Ask for Bank Name
-        String bankName = Main.prompt("Enter Bank Name: ", false).trim();
+        // Prompt user for bank name and passcode
+        Field<String, String> bankNameField = new Field<>("Bank Name", String.class, null, new Field.StringFieldValidator());
+        bankNameField.setFieldValue("Enter Bank Name: ");
+        String bankName = bankNameField.getFieldValue();
 
         // Find the bank based on Name
         Bank selectedBank = null;
@@ -133,14 +131,17 @@ public class BankLauncher {
             return;
         }
 
-        // Request Passcode
-        String passcode = Main.prompt("Enter Bank Passcode: ", true).trim();
+        Field<String, String> passcodeField = new Field<>("Bank Passcode", String.class, null, new Field.StringFieldValidator());
+        passcodeField.setFieldValue("Enter Bank Passcode: ");
+        String passcode = passcodeField.getFieldValue();
 
         // Validate Passcode
         if (!selectedBank.getPasscode().equals(passcode)) {
             System.out.println("Error: Incorrect passcode. Access denied.");
             return;
         }
+        // Set the associated bank in AccountLauncher
+        AccountLauncher.setAssocBank(selectedBank);
 
         // Set logged-in session
         setLogSession(selectedBank);
@@ -176,7 +177,6 @@ public class BankLauncher {
     private static void addBank(Bank b) {
         banks.add(b);
         System.out.println("Bank successfully added: " + b.getName());
-        saveBanks();
     }
 
     /**

@@ -57,15 +57,20 @@ public class JSONDatabase {
     /**
      * Saves JSON data to a file.
      *
-     * @param items The JSONArray containing the data to be saved.
+     * @param data The JSONArray containing the data to be saved.
      * @param filename The path to the JSON file.
      */
     public static void save(JSONArray items, String filename) {
-        try (FileWriter file = new FileWriter(filename)) {
+        File file = new File(filename);
+        File parentDir = file.getParentFile();
+        if (parentDir != null && !parentDir.exists()) {
+            parentDir.mkdirs(); // Create the directories if they do not exist
+        }
+        try (FileWriter fileWriter = new FileWriter(file)) {
             // Write the JSON data to the file with pretty printing
             String jsonString = GSON.toJson(items);
-            file.write(jsonString);
-            file.flush();
+            fileWriter.write(jsonString);
+            fileWriter.flush();
         } catch (IOException e) {
             // Log the error
             LOGGER.log(Level.SEVERE, "Error saving JSON file", e);
@@ -99,11 +104,13 @@ public class JSONDatabase {
             jsonObject.put("accounts", accountsArray);
         // If the data is an instance of Account, populate the jsonObject with account details
         } else if (data instanceof Account account) {
+            jsonObject.put("bankId", account.getBank().getBankId());
             jsonObject.put("accountNumber", account.getAccountNumber());
             jsonObject.put("ownerFname", account.getOwnerFname());
             jsonObject.put("ownerLname", account.getOwnerLname());
             jsonObject.put("ownerEmail", account.getOwnerEmail());
             jsonObject.put("pin", account.getPin());
+            jsonObject.put("accountType", account.getClass().getSimpleName()); 
 
             JSONArray transactionsArray = new JSONArray();
             for (Transaction transaction : account.getTransactions()) {

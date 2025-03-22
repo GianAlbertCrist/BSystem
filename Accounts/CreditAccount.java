@@ -3,7 +3,6 @@ package Accounts;
 import Bank.Bank;
 import Processes.Payment;
 import Processes.Recompense;
-import Processes.Transaction;
 import Processes.TransactionManager;
 
 /**

@@ -5,6 +5,7 @@ import Processes.IllegalAccountType;
 import Processes.Transaction;
 import Bank.*;
 import java.util.Scanner;
+import java.io.File;
 
 public class Main
 {
@@ -22,10 +23,19 @@ public class Main
             Integer.class, -1, new Field.IntegerFieldValidator());
 
     public static void main(String[] args) throws IllegalAccountType {
-        // Load banks, accounts, and transactions from JSON files
-        BankLauncher.loadBanks();
-        AccountLauncher.loadAccounts();
-        Transaction.loadTransactions();
+        // Load banks, accounts, and transactions from JSON files if they exist
+        if (new File("Database/Banks.json").exists()) {
+            BankLauncher.loadBanks();
+            System.out.println("Banks loaded.");
+        }
+        if (new File("Database/Accounts.json").exists()) {
+            AccountLauncher.loadAccounts();
+            System.out.println("Accounts loaded.");
+        }
+        if (new File("Database/Transactions.json").exists()) {
+            Transaction.loadTransactions();
+        }
+
         while (true)
         {
             showMenuHeader("Main Menu");
