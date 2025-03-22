@@ -203,14 +203,6 @@ public class JSONDatabase {
 
             Bank bank = new Bank(bankId, bankName, passcode, depositLimit, withdrawLimit, creditLimit, processingFee);
 
-            JSONArray accountsArray = (JSONArray) jsonObject.get("accounts");
-            for (Object obj : accountsArray) {
-                JSONObject accountObject = (JSONObject) obj;
-                Account account = dataFromDict(accountObject, Account.class);
-                if (account != null) {
-                    bank.addNewAccount(account);
-                }
-            }
             return clazz.cast(bank);
         } else if (clazz == Account.class) {
             int bankId = ((Long) jsonObject.get("bankId")).intValue();

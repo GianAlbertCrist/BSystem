@@ -22,6 +22,7 @@ public class BankLauncher {
     //The name of the file where account information is stored.
     private static final String BANKS_FILE = "Database/Banks.json";
 
+    static {loadBanks();}
     /**
      * Checks if there is a currently logged-in bank session.
      *
@@ -364,6 +365,7 @@ public class BankLauncher {
      * This method is used to restore the bank data from a previous program execution.
      */
     public static void loadBanks() {
+        banks.clear();
         JSONArray data = JSONDatabase.load(BANKS_FILE);
         for (Object obj : data) {
             JSONObject bankObject = (JSONObject) obj;

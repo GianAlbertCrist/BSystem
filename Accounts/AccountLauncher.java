@@ -21,6 +21,7 @@ public class AccountLauncher {
     private static Bank assocBank;
     //The name of the file where account information is stored.
     private static final String ACCOUNTS_FILE = "Database/Accounts.json";
+    static{loadAccounts();}
 
     public static void setAssocBank(Bank assocBank) {
         AccountLauncher.assocBank = assocBank;
@@ -237,6 +238,7 @@ public class AccountLauncher {
         }
         JSONDatabase.mergeAndSaveData(data, ACCOUNTS_FILE);
     }
+
     /**
      * Loads all account data from the JSON file and associates each account with its respective bank.
      * The method uses the JSONDatabase class to load the account data from the specified file.
@@ -249,6 +251,8 @@ public class AccountLauncher {
             Account account = JSONDatabase.dataFromDict(accountObject, Account.class);
             if (account != null) {
                 accounts.add(account);
+                Bank bank = account.getBank();
+                bank.addNewAccount(account);
             }
         }
     }

@@ -78,9 +78,9 @@ public class Main
                 case 4:
                     System.out.println("Exiting. Thank you for banking!");
                     //Saving the latest state of banks, accounts, and transactions to JSON files
-                    BankLauncher.saveBanks();
-                    AccountLauncher.saveAccounts();
                     Transaction.saveTransactions();
+                    AccountLauncher.saveAccounts();
+                    BankLauncher.saveBanks();
                     System.exit(0);
 
                 default:

@@ -1,0 +1,23 @@
+[
+  {
+    "bankId": 0,
+    "depositLimit": 50000.0,
+    "creditLimit": 100000.0,
+    "bankName": "BDO",
+    "withdrawLimit": 50000.0,
+    "accounts": [
+      {
+        "bankId": 0,
+        "pin": "2222",
+        "accountType": "SavingsAccount",
+        "ownerFname": "Gian",
+        "accountNumber": "00002",
+        "transactions": [],
+        "ownerLname": "Daytic",
+        "ownerEmail": "@gmail.com"
+      }
+    ],
+    "passcode": "1234",
+    "processingFee": 10.0
+  }
+]
