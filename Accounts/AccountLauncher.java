@@ -235,9 +235,8 @@ public class AccountLauncher {
         for (Account account : accounts) {
             data.add(JSONDatabase.dataToDict(account));
         }
-        JSONDatabase.save(data, ACCOUNTS_FILE);
+        JSONDatabase.mergeAndSaveData(data, ACCOUNTS_FILE);
     }
-
     /**
      * Loads all account data from the JSON file and associates each account with its respective bank.
      * The method uses the JSONDatabase class to load the account data from the specified file.
@@ -248,7 +247,9 @@ public class AccountLauncher {
         for (Object obj : data) {
             JSONObject accountObject = (JSONObject) obj;
             Account account = JSONDatabase.dataFromDict(accountObject, Account.class);
-            accounts.add(account);
+            if (account != null) {
+                accounts.add(account);
+            }
         }
     }
 }

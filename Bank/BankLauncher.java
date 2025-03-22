@@ -355,7 +355,7 @@ public class BankLauncher {
         for (Bank bank : banks) {
             data.add(JSONDatabase.dataToDict(bank));
         }
-        JSONDatabase.save(data, BANKS_FILE);
+        JSONDatabase.mergeAndSaveData(data, BANKS_FILE);
     }
 
 
@@ -368,7 +368,9 @@ public class BankLauncher {
         for (Object obj : data) {
             JSONObject bankObject = (JSONObject) obj;
             Bank bank = JSONDatabase.dataFromDict(bankObject, Bank.class);
-            banks.add(bank);
+            if (bank != null) {
+                banks.add(bank);
+            }
         }
     }
 }

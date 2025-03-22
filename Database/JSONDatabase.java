@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -305,5 +307,39 @@ public class JSONDatabase {
             jsonArray.add(dataToDict(data));
         }
         save(jsonArray, filename);
+    }
+
+    /**
+     * Merges new data with existing data in the JSON file.
+     *
+     * @param newData The new data to be merged.
+     * @param filename The path to the JSON file.
+     */
+    public static void mergeAndSaveData(JSONArray newData, String filename) {
+        JSONArray existingData = load(filename);
+        Map<String, JSONObject> dataMap = new HashMap<>();
+
+        // Load existing data into the map
+        for (Object obj : existingData) {
+            JSONObject jsonObject = (JSONObject) obj;
+            String key = (String) jsonObject.get("accountNumber");
+            dataMap.put(key, jsonObject);
+        }
+
+        // Merge new data into the map
+        for (Object obj : newData) {
+            JSONObject jsonObject = (JSONObject) obj;
+            String key = (String) jsonObject.get("accountNumber");
+            dataMap.put(key, jsonObject);
+        }
+
+        // Convert map back to JSONArray
+        JSONArray mergedData = new JSONArray();
+        for (JSONObject jsonObject : dataMap.values()) {
+            mergedData.add(jsonObject);
+        }
+
+        // Save merged data
+        save(mergedData, filename);
     }
 }
