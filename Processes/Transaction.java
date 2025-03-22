@@ -17,7 +17,7 @@ public class Transaction {
         ReceiveTransfer,
         ExternalTransfer,
         Payment,
-        Recompense
+        Recompense, Credit
     }
 
     /**

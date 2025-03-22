@@ -4,6 +4,7 @@ import Bank.Bank;
 import Processes.Payment;
 import Processes.Recompense;
 import Processes.Transaction;
+import Processes.TransactionManager;
 
 /**
  * CreditAccount class representing a bank account that operates on credit.
@@ -78,31 +79,11 @@ public class CreditAccount extends Account implements Payment, Recompense {
      */
     @Override
     public boolean pay(Account account, double amount) {
-        if (!(account instanceof SavingsAccount savingsAccount)) {
-            throw new IllegalArgumentException("Credit Accounts can only pay to Savings Accounts.");
+        if (TransactionManager.pay(this, account, amount)) {
+            adjustLoanAmount(-amount);
+            return true;
         }
-
-        // Check if the Credit Account is allowed to increase loan
-        if (!canCredit(amount)) {
-            System.out.println("Payment failed: Not enough credit available.");
-            return false;
-        }
-
-        // Increase loan balance (because payment is borrowing money)
-        adjustLoanAmount(amount);
-
-        // Add the paid amount to the recipient's balance
-        savingsAccount.adjustAccountBalance(amount);
-
-        // Log the transaction for both accounts
-        addNewTransaction(account.getAccountNumber(), Transaction.Transactions.Payment,
-                String.format("Paid Php %.2f to %s", amount, account.getAccountNumber()));
-
-        savingsAccount.addNewTransaction(this.getAccountNumber(), Transaction.Transactions.ReceiveTransfer,
-                String.format("Received Php %.2f from Credit Account %s", amount, this.getAccountNumber()));
-
-        System.out.println("Payment successful. New loan balance: Php" + this.loanBalance);
-        return true;
+        return false;
     }
 
     /**
@@ -114,16 +95,11 @@ public class CreditAccount extends Account implements Payment, Recompense {
      */
     @Override
     public boolean recompense(double amount) {
-        if (amount <= 0 || amount > loanBalance) {
-            return false; // Invalid amount or exceeding owed loan
+        if (TransactionManager.recompense(this, amount)) {
+            adjustLoanAmount(-amount);
+            return true;
         }
-
-        // Deduct from the loan balance and log the recompense
-        adjustLoanAmount(-amount);
-         addNewTransaction(getAccountNumber(), Transaction.Transactions.Recompense,
-                 String.format("Recompensed Php %s to the bank.", amount));
-
-        return true;
+        return false;
     }
 
     @Override

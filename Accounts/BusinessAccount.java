@@ -23,6 +23,9 @@ public class BusinessAccount extends Account implements Deposit, Withdrawal, Fun
         this.bankAnnualIncome = bankAnnualIncome;
         this.businessBalance = initialDeposit;
     }
+    public double getBusinessBalane(){
+        return this.businessBalance;
+    }
 
     public String getBusinessPermitID() {
         return this.businessPermitID;
@@ -46,7 +49,7 @@ public class BusinessAccount extends Account implements Deposit, Withdrawal, Fun
         return bankAnnualIncome * 20; // custom Limit for BusinessAccount
     }
 
-    public void adjustAccountBalance(double amount) {
+    private void adjustAccountBalance(double amount) {
         this.businessBalance += amount;
         if (this.businessBalance < 0) {
             this.businessBalance = 0.0;
@@ -57,86 +60,40 @@ public class BusinessAccount extends Account implements Deposit, Withdrawal, Fun
         System.out.println("Warning: Insufficient balance to complete the transaction.");
     }
 
-
-
     @Override
     public boolean cashDeposit(double amount) {
-        if (amount > getBank().getDepositLimit()) {
-            System.out.println("Deposit amount exceeds the bank's limit.");
-            return false;
+        if (TransactionManager.deposit(this, amount)) {
+            adjustAccountBalance(amount);
+            return true;
         }
-        this.adjustAccountBalance(amount);
-
-        // Ensure a transaction log is added for the deposit
-        this.addNewTransaction(this.getAccountNumber(), Transaction.Transactions.Deposit,
-                "Deposited Php " + amount);
-
-        return true;
+        return false;
     }
 
     @Override
     public boolean withdrawal(double amount) {
-        if (amount <= 0 || amount > this.businessBalance || amount > getBank().getWithdrawLimit()) {
-            insufficientBalance();
-            return false; // Cannot withdraw more than available balance or withdrawal limit
+        if (TransactionManager.withdraw(this, amount)) {
+            adjustAccountBalance(-amount);
+            return true;
         }
-
-        // Adjust balance and log transaction
-        adjustAccountBalance(-amount);
-        addNewTransaction(getAccountNumber(), Transaction.Transactions.Withdraw,
-                String.format("Withdraw Php %.2f", amount));
-
-        return true;
+        return false;
     }
 
     @Override
     public boolean transfer(Bank bank, Account account, double amount) throws IllegalAccountType {
-        if (!(account instanceof BusinessAccount)) {
-            throw new IllegalAccountType("Can only tranfer funds to a Business account.");
+        if (TransactionManager.externalTransfer(bank, this, bank, account, amount)) {
+            adjustAccountBalance(-amount);
+            return true;
         }
-
-        if (!hasEnoughBalance(amount) || amount <= 0 || amount > getBank().getWithdrawLimit()) {
-            insufficientBalance();
-            return false;
-        }
-
-        // Deduct from sender and add to recipient
-        adjustAccountBalance(-amount);
-        ((BusinessAccount) account).adjustAccountBalance(amount);
-
-        // Log transactions for both accounts
-        addNewTransaction(account.getAccountNumber(), Transaction.Transactions.FundTransfer,
-                String.format("Transferred Php %.2f to %s", amount, account.getAccountNumber()));
-        account.addNewTransaction(getAccountNumber(), Transaction.Transactions.ReceiveTransfer,
-                String.format("Received Php %.2f from %s", amount, getAccountNumber()));
-
-        return true;
+        return false;
     }
 
     @Override
     public boolean transfer(Account account, double amount) throws IllegalAccountType {
-        double totalAmount = amount + this.getBank().getProcessingFee();
-
-        if (!hasEnoughBalance(totalAmount) || amount <= 0 || totalAmount > this.getBank().getWithdrawLimit()) {
-            insufficientBalance();
-            return false; // Insufficient funds or exceeding withdrawal limit
+        if (TransactionManager.internalTransfer(this, account, amount)) {
+            adjustAccountBalance(-amount);
+            return true;
         }
-
-        // Deduct full amount from sender including processing fee
-        adjustAccountBalance(-totalAmount);
-
-        // Credit only the transferred amount (not including fee) to recipient
-        ((SavingsAccount) account).adjustAccountBalance(amount);
-
-        // Log transactions for both accounts
-        addNewTransaction(account.getAccountNumber(), Transaction.Transactions.ExternalTransfer,
-                String.format("Transferred Php %.2f to %s at %s (Fee: Php %.2f)",
-                        amount, account.getAccountNumber(), getBank().getName(), this.getBank().getProcessingFee()));
-
-        account.addNewTransaction(getAccountNumber(), Transaction.Transactions.ReceiveTransfer,
-                String.format("Received Php %.2f from %s at %s", amount, this.getAccountNumber(), this.getBank().getName()));
-
-        return true;
+        return false;
     }
 
     @Override

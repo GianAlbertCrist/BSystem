@@ -2,8 +2,8 @@ package Accounts;
 
 import Bank.Bank;
 import Processes.Deposit;
-import Processes.Transaction;
 import Processes.Withdrawal;
+import Processes.TransactionManager;
 
 public class StudentAccount extends Account implements Deposit, Withdrawal {
 
@@ -62,7 +62,7 @@ public class StudentAccount extends Account implements Deposit, Withdrawal {
      *
      * @param amount - Amount to be added or subtracted from the balance.
      */
-    public void adjustAccountBalance(double amount) {
+    private void adjustAccountBalance(double amount) {
         this.savingsBalance += amount;
         if (this.savingsBalance < 0) {
             this.savingsBalance = 0.0;
@@ -77,45 +77,33 @@ public class StudentAccount extends Account implements Deposit, Withdrawal {
     }
 
     /**
-     * Deposit funds into the student account. The deposit cannot exceed the deposit limit for student accounts.
+     * Deposit funds into the student account using TransactionManager.
      *
      * @param amount - The amount to be deposited.
      * @return true if the deposit is successful, false otherwise.
      */
     @Override
     public boolean cashDeposit(double amount) {
-        if (amount > depositLimit()) {
-            System.out.println("Deposit exceeded the Maximum Limit");
-            return false;
+        if (TransactionManager.deposit(this, amount)) {
+            adjustAccountBalance(amount);
+            return true;
         }
-        this.adjustAccountBalance(amount);
-
-        // Add transaction log for the deposit
-        this.addNewTransaction(this.getAccountNumber(), Transaction.Transactions.Deposit,
-                "Deposited Php " + amount);
-
-        return true;
+        return false;
     }
 
     /**
-     * Withdraw funds from the student account. Withdrawal cannot exceed the available balance or the withdrawal limit.
+     * Withdraw funds from the student account using TransactionManager.
      *
      * @param amount - The amount to be withdrawn.
      * @return true if the withdrawal is successful, false otherwise.
      */
     @Override
     public boolean withdrawal(double amount) {
-        if (amount <= 0 || amount > this.savingsBalance || amount > getBank().getWithdrawLimit()) {
-            insufficientBalance();
-            return false; // Cannot withdraw more than available balance or withdrawal limit
+        if (TransactionManager.withdraw(this, amount)) {
+            adjustAccountBalance(-amount);
+            return true;
         }
-
-        // Adjust balance and log transaction
-        adjustAccountBalance(-amount);
-        addNewTransaction(getAccountNumber(), Transaction.Transactions.Withdraw,
-                String.format("Withdraw Php %.2f", amount));
-
-        return true;
+        return false;
     }
 
     /**
@@ -128,9 +116,7 @@ public class StudentAccount extends Account implements Deposit, Withdrawal {
                 this.getAccountNumber(), getOwnerFullName(), this.savingsBalance);
     }
 
-
     public double getAccountBalance() {
         return this.savingsBalance;
     }
-
 }
