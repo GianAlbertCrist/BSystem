@@ -8,6 +8,10 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import Accounts.Account;
+import Accounts.BusinessAccount;
+import Accounts.CreditAccount;
+import Accounts.SavingsAccount;
+import Accounts.StudentAccount;
 import Bank.Bank;
 import Bank.BankLauncher;
 import Processes.*;
@@ -57,7 +61,7 @@ public class JSONDatabase {
     /**
      * Saves JSON data to a file.
      *
-     * @param data The JSONArray containing the data to be saved.
+     * @param items The JSONArray containing the data to be saved.
      * @param filename The path to the JSON file.
      */
     public static void save(JSONArray items, String filename) {
@@ -152,36 +156,68 @@ public class JSONDatabase {
             for (Object obj : accountsArray) {
                 JSONObject accountObject = (JSONObject) obj;
                 Account account = (Account) dataFromDict(accountObject, Account.class);
-                assert account != null;
-                bank.addNewAccount(account);
+                if (account != null) {
+                    bank.addNewAccount(account);
+                }
             }
-            return bank;
+            return clazz.cast(bank);
         // If the clazz is Account, create a new Account object and populate it with account details
         } else if (clazz == Account.class) {
+            int bankId = ((Long) jsonObject.get("bankId")).intValue();
+            Bank bank = BankLauncher.getBankById(bankId);
+            if (bank == null) {
+                LOGGER.log(Level.SEVERE, "Bank not found for ID: {0}", bankId);
+                return null;
+            }
             String accountNumber = (String) jsonObject.get("accountNumber");
             String ownerFname = (String) jsonObject.get("ownerFname");
             String ownerLname = (String) jsonObject.get("ownerLname");
             String ownerEmail = (String) jsonObject.get("ownerEmail");
             String pin = (String) jsonObject.get("pin");
+            String accountType = (String) jsonObject.get("accountType");
 
-            Bank bank = BankLauncher.findAccount(accountNumber).getBank();
-            Account account = new Account(bank, accountNumber, pin, ownerFname, ownerLname, ownerEmail) {};
+            Account account;
+            switch (accountType) {
+                case "CreditAccount":
+                    account = new CreditAccount(bank, accountNumber, pin, ownerFname, ownerLname, ownerEmail);
+                    break;
+                case "SavingsAccount":
+                    double initialDeposit = (Double) jsonObject.get("initialDeposit");
+                    account = new SavingsAccount(bank, accountNumber, pin, ownerFname, ownerLname, ownerEmail, initialDeposit);
+                    break;
+                case "StudentAccount":
+                    int yearOfBirth = ((Long) jsonObject.get("yearOfBirth")).intValue();
+                    String studentId = (String) jsonObject.get("studentId");
+                    account = new StudentAccount(bank, accountNumber, pin, ownerFname, ownerLname, ownerEmail, yearOfBirth, studentId);
+                    break;
+                case "BusinessAccount":
+                    String businessPermitID = (String) jsonObject.get("businessPermitID");
+                    String businessName = (String) jsonObject.get("businessName");
+                    double bankAnnualIncome = (Double) jsonObject.get("bankAnnualIncome");
+                    double initialDepositBusiness = (Double) jsonObject.get("initialDeposit");
+                    account = new BusinessAccount(bank, accountNumber, pin, ownerFname, ownerLname, ownerEmail, businessPermitID, businessName, bankAnnualIncome, initialDepositBusiness);
+                    break;
+                default:
+                    LOGGER.log(Level.SEVERE, "Unknown account type: {0}", accountType);
+                    return null;
+            }
 
             JSONArray transactionsArray = (JSONArray) jsonObject.get("transactions");
             for (Object obj : transactionsArray) {
                 JSONObject transactionObject = (JSONObject) obj;
                 Transaction transaction = (Transaction) dataFromDict(transactionObject, Transaction.class);
-                assert transaction != null;
-                account.addNewTransaction(transaction.accountNumber, transaction.transactionType, transaction.description);
+                if (transaction != null) {
+                    account.addNewTransaction(transaction.accountNumber, transaction.transactionType, transaction.description);
+                }
             }
-            return account;
+            return clazz.cast(account);
         // If the clazz is Transaction, create a new Transaction object and populate it with transaction details
         } else if (clazz == Transaction.class) {
             String accountNum = (String) jsonObject.get("accountNum");
             Transaction.Transactions type = Transaction.Transactions.valueOf((String) jsonObject.get("type"));
             String description = (String) jsonObject.get("description");
             LocalDateTime time = LocalDateTime.parse((String) jsonObject.get("time"));
-            return new Transaction(accountNum, type, description, time);
+            return clazz.cast(new Transaction(accountNum, type, description, time));
         }
         return null;
     }

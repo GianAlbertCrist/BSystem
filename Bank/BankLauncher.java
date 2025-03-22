@@ -333,6 +333,15 @@ public class BankLauncher {
                 .orElse(null);
     }
 
+    public static Bank getBankById(int bankId) {
+        for (Bank bank : banks) {
+            if (bank.getBankId() == bankId) {
+                return bank;
+            }
+        }
+        return null;
+    }
+
     /**
      * Saves the list of banks to a JSON file.
      * This method is used to persist the bank data between program executions.
