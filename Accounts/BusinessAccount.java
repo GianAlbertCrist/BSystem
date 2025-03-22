@@ -44,6 +44,13 @@ public class BusinessAccount extends Account implements Deposit, Withdrawal, Fun
                 this.getAccountNumber(), getBusinessName(), getBusinessPermitID(), this.businessBalance);
     }
 
+    /**
+     * Adjusts the business account balance by adding or subtracting the specified amount.
+     * If the resulting balance is less than zero, it sets the balance to zero.
+     *
+     * @param amount The amount to adjust the balance by. A positive value increases the balance,
+     *               while a negative value decreases the balance.
+     */
     public void adjustAccountBalance(double amount) {
         this.businessBalance += amount;
         if (this.businessBalance < 0) {
@@ -51,9 +58,17 @@ public class BusinessAccount extends Account implements Deposit, Withdrawal, Fun
         }
     }
 
+
+    /**
+     * Prints a warning message indicating that there is insufficient balance in the business account
+     * to complete the transaction.
+     *
+     * @return This method does not return any value. It only prints a warning message to the console.
+     */
     public void insufficientBalance() {
         System.out.println("Warning: Insufficient balance to complete the transaction.");
     }
+
 
     @Override
     public boolean cashDeposit(double amount) {

@@ -86,19 +86,27 @@ public abstract class Account {
      * @return A formatted string containing all transaction details.
      */
     public String getTransactionsInfo() {
+        // Check if there are no transactions
         if (transactions.isEmpty()) {
+            // Return a message indicating no transactions found
             return "No transactions found for this account.";
         }
 
+        // Initialize a StringBuilder to build the transaction log
         StringBuilder transactionLog = new StringBuilder("Transaction History:\n");
+        
+        // Iterate over each transaction in the transactions list
         for (Transaction transaction : transactions) {
+            // Append the transaction details to the log
             transactionLog.append(transaction.toString()).append("\n");
         }
+        
+        // Return the complete transaction log as a string
         return transactionLog.toString();
-    }
+        }
 
-    @Override
-    public String toString() {
+        @Override
+        public String toString() {
         return String.format("{Owner: %s, Email: %s, Bank: %s, Account Number: %s, Transactions Count: %d}",
                             getOwnerFullName(), ownerEmail, bank.getName(), accountNumber, transactions.size());
     }

@@ -2,25 +2,31 @@
   {
     "accountNum": "00002",
     "description": "Paid Php 500.0 to 00002",
-    "time": "2025-03-22T20:07:20.711762300",
+    "time": "2025-03-22T21:26:04.055741",
     "type": "Payment"
   },
   {
     "accountNum": "00001",
     "description": "Received Php 500.0 from 00001",
-    "time": "2025-03-22T20:07:20.796922300",
+    "time": "2025-03-22T21:26:04.227948500",
     "type": "ReceivePayment"
   },
   {
     "accountNum": "00001",
     "description": "Recompensed Php 200.0",
-    "time": "2025-03-22T20:07:27.225918600",
+    "time": "2025-03-22T21:26:10.070919",
     "type": "Recompense"
   },
   {
     "accountNum": "00002",
     "description": "Deposited Php 500.0",
-    "time": "2025-03-22T20:08:05.611454400",
+    "time": "2025-03-22T21:26:45.859580900",
     "type": "Deposit"
+  },
+  {
+    "accountNum": "00002",
+    "description": "Withdraw Php 500.00",
+    "time": "2025-03-22T21:27:18.403802",
+    "type": "Withdraw"
   }
 ]
