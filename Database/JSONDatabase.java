@@ -230,7 +230,11 @@ public class JSONDatabase {
                     account = new CreditAccount(bank, accountNumber, pin, ownerFname, ownerLname, ownerEmail);
                     break;
                 case "SavingsAccount":
-                    double initialDeposit = (Double) jsonObject.get("initialDeposit");
+                    Double initialDeposit = (Double) jsonObject.get("initialDeposit");
+                    if (initialDeposit == null) {
+                        LOGGER.log(Level.SEVERE, "Initial deposit not found for SavingsAccount: {0}", accountNumber);
+                        return null;
+                    }
                     account = new SavingsAccount(bank, accountNumber, pin, ownerFname, ownerLname, ownerEmail, initialDeposit);
                     break;
                 case "StudentAccount":
@@ -241,8 +245,12 @@ public class JSONDatabase {
                 case "BusinessAccount":
                     String businessPermitID = (String) jsonObject.get("businessPermitID");
                     String businessName = (String) jsonObject.get("businessName");
-                    double bankAnnualIncome = (Double) jsonObject.get("bankAnnualIncome");
-                    double initialDepositBusiness = (Double) jsonObject.get("initialDeposit");
+                    Double bankAnnualIncome = (Double) jsonObject.get("bankAnnualIncome");
+                    Double initialDepositBusiness = (Double) jsonObject.get("initialDeposit");
+                    if (bankAnnualIncome == null || initialDepositBusiness == null) {
+                        LOGGER.log(Level.SEVERE, "Bank annual income or initial deposit not found for BusinessAccount: {0}", accountNumber);
+                        return null;
+                    }
                     account = new BusinessAccount(bank, accountNumber, pin, ownerFname, ownerLname, ownerEmail, businessPermitID, businessName, bankAnnualIncome, initialDepositBusiness);
                     break;
                 default:

@@ -38,7 +38,17 @@ public enum Menu {
      * SavingsAccount type selection menu. Used when logging in as a SavingsAccount.
      */
     SavingsAccountMenu(new String[]{ "Show Balance", "Deposit", "Withdraw", "Fund Transfer",
-            "Show Transactions", "Logout" }, 51);
+            "Show Transactions", "Logout" }, 51),
+    /**
+     * StudentAccount type selection menu. Used when logging in as a StudentAccount.
+     */
+    StudentAccountMenu(new String[]{ "Show Balance", "Deposit", "Withdraw", "Fund Transfer",
+            "Show Transactions", "Logout" }, 52),
+    /**
+     * BusinessAccount type selection menu. Used when logging in as a BusinessAccount.
+     */
+    BusinessAccountMenu(new String[]{ "Show Balance", "Deposit", "Withdraw", "Fund Transfer",
+            "Show Transactions", "Logout" }, 61);
 
     public final String[] menuOptions;
     public final int menuIdx;
