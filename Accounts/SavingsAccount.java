@@ -33,6 +33,8 @@ public class SavingsAccount extends Account implements Withdrawal, Deposit, Fund
         this.balance = balance;
     }
 
+
+
     /**
      * Adjust the account balance of this savings account.
      * @param amount - Amount to be added or subtracted from the balance.
@@ -65,26 +67,96 @@ public class SavingsAccount extends Account implements Withdrawal, Deposit, Fund
     }
 
     /**
-     * Transfer funds to another account using TransactionManager.
-     * @param account - The recipient account.
-     * @param amount - The amount to transfer.
-     * @return true if transfer is successful, false otherwise.
+     * Validates whether this savings account has enough balance to proceed with such a transaction
+     * based on the amount that is to be adjusted.
+     * 
+     * @param amount - Amount of money to be supposedly adjusted from this account’s balance.
+     * @return - Flag if transaction can proceed by adjusting the account balance by the amount to be
+     * changed.
+     */
+    private boolean hasEnoughBalance(double amount) {
+        return balance >= amount;
+    }
+
+    private void insufficientBalance() {
+        System.out.println("Warning: Insufficient balance to complete the transaction.");
+    }
+
+
+    /**
+     * Transfers an amount of money from this account to another savings account. Is extensively used
+     * by the other transfer() method
+     * <br><br>
+     * Cannot proceed if one of the following is true:
+     * <ul>
+     *     <li>Insufficient balance from source account.</li>
+     *     <li>Recipient account does not exist.</li>
+     *     <li>Recipient account is from another bank.</li>
+     * </ul>
+     * @param account – Account number of recipient
+     * @param amount – Amount of money to be supposedly adjusted from this account’s balance.
+     * @throws IllegalAccountType Cannot fund transfer when the other account is of type
+     * CreditAccount.
+     * @return Flag if fund transfer transaction is successful or not.
      */
     @Override
     public boolean transfer(Account account, double amount) throws IllegalAccountType {
-        return TransactionManager.internalTransfer(this, account, amount);
+        if (!(account instanceof SavingsAccount)) {
+            throw new IllegalAccountType("Cannot transfer funds to a CreditAccount.");
+        }
+
+        if (!hasEnoughBalance(amount) || amount <= 0 || amount > getBank().getWithdrawLimit()) {
+            insufficientBalance();
+            return false;
+        }
+
+        // Deduct from sender and add to recipient
+        adjustAccountBalance(-amount);
+        ((SavingsAccount) account).adjustAccountBalance(amount);
+
+        // Log transactions for both accounts
+        addNewTransaction(account.getAccountNumber(), Transaction.Transactions.FundTransfer,
+                String.format("Transferred Php %.2f to %s", amount, account.getAccountNumber()));
+        account.addNewTransaction(getAccountNumber(), Transaction.Transactions.ReceiveTransfer,
+                String.format("Received Php %.2f from %s", amount, getAccountNumber()));
+
+        return true;
     }
 
     /**
-     * Transfer funds to an external bank account using TransactionManager.
-     * @param bank - The recipient's bank.
-     * @param account - The recipient account.
-     * @param amount - The amount to transfer.
-     * @return true if transfer is successful, false otherwise.
+     * Transfers an amount of money from this account to another savings account.
+     * Should be used when transferring to other banks.
+     *
+     * @param bank Bank object of the recipient
+     * @param account Account number of recipient
+     * @param amount Amount of money to be supposedly adjusted from this account's balance
+     * @return Flag if fund transfer transaction is successful or not
+     * @throws IllegalAccountType Cannot fund transfer when the other account is of type CreditAccount
      */
     @Override
     public boolean transfer(Bank bank, Account account, double amount) throws IllegalAccountType {
-        return TransactionManager.externalTransfer(this.getBank(), this, bank, account, amount);
+        double totalAmount = amount + this.getBank().getProcessingFee();
+
+        if (!hasEnoughBalance(totalAmount) || amount <= 0 || totalAmount > this.getBank().getWithdrawLimit()) {
+            insufficientBalance();
+            return false; // Insufficient funds or exceeding withdrawal limit
+        }
+
+        // Deduct full amount from sender including processing fee
+        adjustAccountBalance(-totalAmount);
+
+        // Credit only the transferred amount (not including fee) to recipient
+        ((SavingsAccount) account).adjustAccountBalance(amount);
+
+        // Log transactions for both accounts
+        addNewTransaction(account.getAccountNumber(), Transaction.Transactions.ExternalTransfer,
+                String.format("Transferred Php %.2f to %s at %s (Fee: Php %.2f)", 
+                                    amount, account.getAccountNumber(), bank.getName(), this.getBank().getProcessingFee()));
+
+        account.addNewTransaction(getAccountNumber(), Transaction.Transactions.ReceiveTransfer,
+                String.format("Received Php %.2f from %s at %s", amount, this.getAccountNumber(), this.getBank().getName()));
+
+        return true;
     }
 
     @Override

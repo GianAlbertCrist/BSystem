@@ -6,10 +6,15 @@ import Main.*;
 import Processes.IllegalAccountType;
 import Database.JSONDatabase;
 import java.util.ArrayList;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 /**
  * A class primarily used for interacting with the account module.
  */
 public class AccountLauncher {
+    //List of all accounts in the system.
+    private static ArrayList<Account> accounts = new ArrayList<>();
     //Account object of logged account user.
     private static Account loggedAccount;
     //Selected associated bank when attempting to log in in the account module.
@@ -226,14 +231,11 @@ public class AccountLauncher {
      * and then saves them to a JSON file using the JSONDatabase class.
      */
     public static void saveAccounts() {
-        ArrayList<Account> data = new ArrayList<>();
-        // Iterate through all banks
-        for (Bank bank : BankLauncher.getBanks()) {
-            // Add all accounts from the current bank to the list
-            data.addAll(bank.getBankAccounts());
+        JSONArray data = new JSONArray();
+        for (Account account : accounts) {
+            data.add(JSONDatabase.dataToDict(account));
         }
-        // Save the list of accounts to a JSON file
-        JSONDatabase.saveData(data, ACCOUNTS_FILE);
+        JSONDatabase.save(data, ACCOUNTS_FILE);
     }
 
     /**
@@ -242,14 +244,11 @@ public class AccountLauncher {
      * For each loaded account, it retrieves the associated bank and adds the account to the bank's list of accounts.
      */
     public static void loadAccounts() {
-        // Load account data from the JSON file
-        ArrayList<Account> loadedAccounts = JSONDatabase.loadData(ACCOUNTS_FILE, Account.class);
-        // Iterate through each loaded account
-        for (Account account : loadedAccounts) {
-            // Retrieve the associated bank
-            Bank bank = account.getBank();
-            // Add the account to the bank's list of accounts
-            bank.addNewAccount(account);
+        JSONArray data = JSONDatabase.load(ACCOUNTS_FILE);
+        for (Object obj : data) {
+            JSONObject accountObject = (JSONObject) obj;
+            Account account = JSONDatabase.dataFromDict(accountObject, Account.class);
+            accounts.add(account);
         }
     }
 }

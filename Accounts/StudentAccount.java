@@ -3,6 +3,7 @@ package Accounts;
 import Bank.Bank;
 import Processes.Deposit;
 import Processes.IllegalAccountType;
+import Processes.Transaction;
 import Processes.TransactionManager;
 import Processes.Withdrawal;
 
@@ -122,12 +123,39 @@ public final class StudentAccount extends Account implements Deposit, Withdrawal
                 this.getAccountNumber(), getOwnerFullName(), this.savingsBalance);
     }
 
-    public boolean transfer(StudentAccount account, double amount) throws IllegalAccountType {
-        return TransactionManager.internalTransfer(this, account, amount);
-    }
+    /**
+     * Transfers an amount of money from this account to another student account.
+     * Cannot proceed if one of the following is true:
+     * <ul>
+     *     <li>Insufficient balance from source account.</li>
+     *     <li>Recipient account does not exist.</li>
+     *     <li>Recipient account is from another bank.</li>
+     * </ul>
+     * @param account – Account number of recipient
+     * @param amount – Amount of money to be supposedly adjusted from this account’s balance.
+     * @return Flag if fund transfer transaction is successful or not.
+     */
+    public boolean transfer(StudentAccount account, double amount) {
+        if (!isEligibleForStudentAccount()) {
+            throw new IllegalArgumentException("Account holder must be between 18 and 25 years old.");
+        }
 
-    public boolean transfer(Bank bank, StudentAccount account, double amount) throws IllegalAccountType{
-        return TransactionManager.externalTransfer(bank, this, bank, account, amount);
+        if (amount <= 0 || amount > this.savingsBalance || amount > getBank().getWithdrawLimit()) {
+            insufficientBalance();
+            return false;
+        }
+
+        // Deduct from sender and add to recipient
+        adjustAccountBalance(-amount);
+        account.adjustAccountBalance(amount);
+
+        // Log transactions for both accounts
+        addNewTransaction(account.getAccountNumber(), Transaction.Transactions.FundTransfer,
+                String.format("Transferred Php %.2f to %s", amount, account.getAccountNumber()));
+        account.addNewTransaction(getAccountNumber(), Transaction.Transactions.ReceiveTransfer,
+                String.format("Received Php %.2f from %s", amount, getAccountNumber()));
+
+        return true;
     }
     
     public double getAccountBalance() {

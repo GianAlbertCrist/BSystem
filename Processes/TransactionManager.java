@@ -105,41 +105,6 @@ public class TransactionManager {
         return false;
     }
 
-
-    
-    /**
-     * This function is responsible for transferring funds from one account in one bank to another account in another bank.
-     *
-     * @param senderBank The bank from which the funds will be transferred.
-     * @param sender The account from which the funds will be transferred.
-     * @param recipientBank The bank to which the funds will be transferred.
-     * @param recipient The account to which the funds will be transferred.
-     * @param amount The amount to be transferred.
-     *
-     * @return A boolean value indicating the success of the transfer operation.
-     *         Returns true if the transfer is successful, false otherwise.
-     *         If the transfer amount is less than or equal to zero or exceeds the withdrawal limit,
-     *         the function will print a warning message and return false.
-     *
-     * @throws IllegalAccountType If the sender account is not a SavingsAccount or BusinessAccount.
-     */
-    public static boolean externalTransfer(Bank senderBank, Account sender, Bank recipientBank, Account recipient, double amount) throws IllegalAccountType {
-        double totalAmount = amount + senderBank.getProcessingFee();
-        if (amount <= 0 || totalAmount > sender.getBank().getWithdrawLimit()) {
-            System.out.println("External transfer failed: Insufficient balance or exceeds withdrawal limit.");
-            return false;
-        }
-        if (sender instanceof SavingsAccount savingsAccount) {
-            return savingsAccount.transfer(recipientBank, recipient, amount);
-        } else if (sender instanceof BusinessAccount businessAccount) {
-            return businessAccount.transfer(recipientBank, recipient, amount);
-        }
-        System.out.println("External transfer failed: Unsupported account type.");
-        return false;
-    }
-
-    
-
     /**
      * This function is responsible for crediting an amount to a specified credit account.
      *

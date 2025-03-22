@@ -115,17 +115,20 @@ public class BusinessAccountLauncher extends AccountLauncher {
             return;
         }
 
+        // Prompt user for transaction type (Internal or External)
         Main.showMenuHeader("Fund Transfer Type");
         System.out.println("[1] Internal Transfer (Account Within this Bank)");
         System.out.println("[2] External Transfer (Account from Different Bank)");
         Main.setOption();
         int transferType = Main.getOption();
 
-        Field<String, Integer> recipientField = new Field<>("Recipient Account Number", String.class, 5, new Field.StringFieldLengthValidator());
+        // Get recipient account number
+        Field<String, Integer> recipientField = new Field<String, Integer>("Recipient Account Number", String.class, 5, new Field.StringFieldLengthValidator());
         recipientField.setFieldValue("Enter recipient account number: ");
         String recipientAccountNum = recipientField.getFieldValue();
 
-        Field<Double, Double> amountField = new Field<>("Transfer Amount", Double.class, 1.0, new Field.DoubleFieldValidator());
+        // Get transfer amount
+        Field<Double, Double> amountField = new Field<Double, Double>("Transfer Amount", Double.class, 1.0, new Field.DoubleFieldValidator());
         amountField.setFieldValue("Enter transfer amount: ");
         double amount = amountField.getFieldValue();
 
@@ -138,14 +141,16 @@ public class BusinessAccountLauncher extends AccountLauncher {
 
             if (recipientAccountNum.equals(getLoggedAccount().getAccountNumber())) {
                 System.out.println("Warning: You are transferring to your own account. Transfer failed.");
-            } else if (TransactionManager.internalTransfer(getLoggedAccount(), recipient, amount)) {
+            } else if (((BusinessAccount) getLoggedAccount()).transfer(recipient, amount)) {
                 System.out.println("Internal transfer successful.");
             } else {
                 System.out.println("Transfer failed. Insufficient funds or limit exceeded.");
             }
 
+         // External Transfer
         } else if (transferType == 2) {
-            Field<Integer, Integer> recipientBankField = new Field<>("Recipient Bank ID", Integer.class, -1, new Field.IntegerFieldValidator());
+            // Get recipient Bank ID instead of name
+            Field<Integer, Integer> recipientBankField = new Field<Integer, Integer>("Recipient Bank ID", Integer.class, -1, new Field.IntegerFieldValidator());
             recipientBankField.setFieldValue("Enter recipient bank ID: ");
             int recipientBankId = recipientBankField.getFieldValue();
 
@@ -165,11 +170,11 @@ public class BusinessAccountLauncher extends AccountLauncher {
             Account recipient = recipientBank.getBankAccount(recipientBank, recipientAccountNum);
 
             if (!(recipient instanceof BusinessAccount)) {
-                System.out.println("Recipient account not found or is not a Business Account.");
+                System.out.println("Recipient account not found or is not a Savings Account or in Credit Account.");
                 return;
             }
 
-            if (TransactionManager.externalTransfer(getLoggedAccount().getBank(), getLoggedAccount(), recipientBank, recipient, amount)) {
+            if (((BusinessAccount) getLoggedAccount()).transfer(recipientBank, recipient, amount)) {
                 System.out.println("External transfer successful. Processing fee of Php" +
                         getLoggedAccount().getBank().getProcessingFee() + " applied.");
             } else {

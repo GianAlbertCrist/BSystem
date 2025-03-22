@@ -1,0 +1,22 @@
+[
+  {
+    "bankId": 0,
+    "depositLimit": 50000.0,
+    "creditLimit": 100000.0,
+    "bankName": "BDO",
+    "withdrawLimit": 50000.0,
+    "accounts": [],
+    "passcode": "1234",
+    "processingFee": 10.0
+  },
+  {
+    "bankId": 1,
+    "depositLimit": 50000.0,
+    "creditLimit": 100000.0,
+    "bankName": "BPI",
+    "withdrawLimit": 50000.0,
+    "accounts": [],
+    "passcode": "4321",
+    "processingFee": 10.0
+  }
+]

@@ -5,6 +5,10 @@ import Main.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Objects;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
 import Database.JSONDatabase;
 
 /**
@@ -347,7 +351,11 @@ public class BankLauncher {
      * This method is used to persist the bank data between program executions.
      */
     public static void saveBanks() {
-        JSONDatabase.saveData(new ArrayList<>(banks), BANKS_FILE);
+        JSONArray data = new JSONArray();
+        for (Bank bank : banks) {
+            data.add(JSONDatabase.dataToDict(bank));
+        }
+        JSONDatabase.save(data, BANKS_FILE);
     }
 
 
@@ -356,11 +364,11 @@ public class BankLauncher {
      * This method is used to restore the bank data from a previous program execution.
      */
     public static void loadBanks() {
-        // Load bank data from the JSON file
-        ArrayList<Bank> loadedBanks = JSONDatabase.loadData(BANKS_FILE, Bank.class);
-        // Clear the current list of banks
-        banks.clear();
-        // Add the loaded banks to the current list
-        banks.addAll(loadedBanks);
+        JSONArray data = JSONDatabase.load(BANKS_FILE);
+        for (Object obj : data) {
+            JSONObject bankObject = (JSONObject) obj;
+            Bank bank = JSONDatabase.dataFromDict(bankObject, Bank.class);
+            banks.add(bank);
+        }
     }
 }

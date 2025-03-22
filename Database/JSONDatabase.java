@@ -2,16 +2,16 @@ package Database;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.TypeAdapter;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import Accounts.Account;
-import Accounts.BusinessAccount;
-import Accounts.CreditAccount;
-import Accounts.SavingsAccount;
-import Accounts.StudentAccount;
+import Accounts.*;
 import Bank.Bank;
 import Bank.BankLauncher;
 import Processes.*;
@@ -21,6 +21,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,7 +33,24 @@ public class JSONDatabase {
 
     // Logger instance for logging errors
     private static final Logger LOGGER = Logger.getLogger(JSONDatabase.class.getName());
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+
+    // Custom TypeAdapter for LocalDateTime
+    private static final TypeAdapter<LocalDateTime> LOCAL_DATE_TIME_ADAPTER = new TypeAdapter<>() {
+        @Override
+        public void write(JsonWriter out, LocalDateTime value) throws IOException {
+            out.value(value.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        }
+
+        @Override
+        public LocalDateTime read(JsonReader in) throws IOException {
+            return LocalDateTime.parse(in.nextString(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        }
+    };
+
+    private static final Gson GSON = new GsonBuilder()
+            .registerTypeAdapter(LocalDateTime.class, LOCAL_DATE_TIME_ADAPTER)
+            .setPrettyPrinting()
+            .create();
 
     /**
      * Loads JSON data from a file.
@@ -59,22 +77,59 @@ public class JSONDatabase {
     }
 
     /**
+     * Loads JSON data from a file.
+     *
+     * @param filename The path to the JSON file.
+     * @return A JSONObject containing the loaded data. If an error occurs during loading, an empty JSONObject is returned.
+     */
+    public static JSONObject loadObject(String filename) {
+        JSONParser parser = new JSONParser();
+        File file = new File(filename);
+        if (!file.exists()) {
+            // Create an empty JSON file if it does not exist
+            save(new JSONObject(), filename);
+        }
+        try (FileReader reader = new FileReader(filename)) {
+            // Parse the JSON file and return the JSONObject
+            Object obj = parser.parse(reader);
+            return (JSONObject) obj;
+        } catch (IOException | ParseException e) {
+            // Log the error and return an empty JSONObject
+            LOGGER.log(Level.SEVERE, "Error loading JSON file", e);
+            return new JSONObject();
+        }
+    }
+
+    /**
      * Saves JSON data to a file.
      *
-     * @param items The JSONArray containing the data to be saved.
+     * @param data The JSONArray containing the data to be saved.
      * @param filename The path to the JSON file.
      */
-    public static void save(JSONArray items, String filename) {
-        File file = new File(filename);
-        File parentDir = file.getParentFile();
-        if (parentDir != null && !parentDir.exists()) {
-            parentDir.mkdirs(); // Create the directories if they do not exist
-        }
-        try (FileWriter fileWriter = new FileWriter(file)) {
+    public static void save(JSONArray data, String filename) {
+        try (FileWriter file = new FileWriter(filename)) {
             // Write the JSON data to the file with pretty printing
-            String jsonString = GSON.toJson(items);
-            fileWriter.write(jsonString);
-            fileWriter.flush();
+            String jsonString = GSON.toJson(data);
+            file.write(jsonString);
+            file.flush();
+        } catch (IOException e) {
+            // Log the error
+            LOGGER.log(Level.SEVERE, "Error saving JSON file", e);
+        }
+    }
+
+    /**
+     * Saves JSON data to a file.
+     *
+     * @param data The JSONObject containing the data to be saved.
+     * @param filename The path to the JSON file.
+     */
+    public static void save(JSONObject data, String filename) {
+        try (FileWriter file = new FileWriter(filename)) {
+            // Write the JSON data to the file with pretty printing
+            String jsonString = GSON.toJson(data);
+            file.write(jsonString);
+            file.flush();
         } catch (IOException e) {
             // Log the error
             LOGGER.log(Level.SEVERE, "Error saving JSON file", e);
@@ -86,12 +141,10 @@ public class JSONDatabase {
      *
      * @param data The object to be converted.
      * @return A JSONObject representing the input object.
-     */  
+     */
     @SuppressWarnings("unchecked")
     public static JSONObject dataToDict(Object data) {
         JSONObject jsonObject = new JSONObject();
-        // Add code to populate the jsonObject based on the type of data
-        // If the data is an instance of Bank, populate the jsonObject with bank details
         if (data instanceof Bank bank) {
             jsonObject.put("bankId", bank.getBankId());
             jsonObject.put("bankName", bank.getName());
@@ -106,7 +159,6 @@ public class JSONDatabase {
                 accountsArray.add(dataToDict(account));
             }
             jsonObject.put("accounts", accountsArray);
-        // If the data is an instance of Account, populate the jsonObject with account details
         } else if (data instanceof Account account) {
             jsonObject.put("bankId", account.getBank().getBankId());
             jsonObject.put("accountNumber", account.getAccountNumber());
@@ -114,17 +166,16 @@ public class JSONDatabase {
             jsonObject.put("ownerLname", account.getOwnerLname());
             jsonObject.put("ownerEmail", account.getOwnerEmail());
             jsonObject.put("pin", account.getPin());
-            jsonObject.put("accountType", account.getClass().getSimpleName()); 
+            jsonObject.put("accountType", account.getClass().getSimpleName());
 
             JSONArray transactionsArray = new JSONArray();
             for (Transaction transaction : account.getTransactions()) {
                 transactionsArray.add(dataToDict(transaction));
             }
             jsonObject.put("transactions", transactionsArray);
-        // If the data is an instance of Transaction, populate the jsonObject with transaction details    
         } else if (data instanceof Transaction transaction) {
             jsonObject.put("accountNum", transaction.accountNumber);
-            jsonObject.put("type", transaction.transactionType);
+            jsonObject.put("type", transaction.transactionType.toString());
             jsonObject.put("description", transaction.description);
             jsonObject.put("time", transaction.getTimestamp().toString());
         }
@@ -138,9 +189,7 @@ public class JSONDatabase {
      * @param clazz The class of the object to be created.
      * @return An object of the specified class, populated with data from the JSONObject.
      */
-    public static Object dataFromDict(JSONObject jsonObject, Class<?> clazz) {
-        // Add code to create an object of the specified class and populate it with data from the jsonObject
-        // If the class is Bank, create a new Bank object and populate it with bank details
+    public static <T> T dataFromDict(JSONObject jsonObject, Class<T> clazz) {
         if (clazz == Bank.class) {
             int bankId = ((Long) jsonObject.get("bankId")).intValue();
             String bankName = (String) jsonObject.get("bankName");
@@ -155,13 +204,12 @@ public class JSONDatabase {
             JSONArray accountsArray = (JSONArray) jsonObject.get("accounts");
             for (Object obj : accountsArray) {
                 JSONObject accountObject = (JSONObject) obj;
-                Account account = (Account) dataFromDict(accountObject, Account.class);
+                Account account = dataFromDict(accountObject, Account.class);
                 if (account != null) {
                     bank.addNewAccount(account);
                 }
             }
             return clazz.cast(bank);
-        // If the clazz is Account, create a new Account object and populate it with account details
         } else if (clazz == Account.class) {
             int bankId = ((Long) jsonObject.get("bankId")).intValue();
             Bank bank = BankLauncher.getBankById(bankId);
@@ -205,13 +253,12 @@ public class JSONDatabase {
             JSONArray transactionsArray = (JSONArray) jsonObject.get("transactions");
             for (Object obj : transactionsArray) {
                 JSONObject transactionObject = (JSONObject) obj;
-                Transaction transaction = (Transaction) dataFromDict(transactionObject, Transaction.class);
+                Transaction transaction = dataFromDict(transactionObject, Transaction.class);
                 if (transaction != null) {
                     account.addNewTransaction(transaction.accountNumber, transaction.transactionType, transaction.description);
                 }
             }
             return clazz.cast(account);
-        // If the clazz is Transaction, create a new Transaction object and populate it with transaction details
         } else if (clazz == Transaction.class) {
             String accountNum = (String) jsonObject.get("accountNum");
             Transaction.Transactions type = Transaction.Transactions.valueOf((String) jsonObject.get("type"));
@@ -233,8 +280,7 @@ public class JSONDatabase {
         JSONArray jsonArray = load(filename);
         ArrayList<T> dataList = new ArrayList<>();
         for (Object obj : jsonArray) {
-            JSONObject jsonObject = (JSONObject) obj;
-            dataList.add(clazz.cast(dataFromDict(jsonObject, clazz)));
+            dataList.add(clazz.cast(dataFromDict((JSONObject) obj, clazz)));
         }
         return dataList;
     }
@@ -244,8 +290,7 @@ public class JSONDatabase {
      *
      * @param dataList The list of objects to be saved.
      * @param filename The path to the JSON file.
-     */   
-    @SuppressWarnings("unchecked")
+     */
     public static <T> void saveData(ArrayList<T> dataList, String filename) {
         JSONArray jsonArray = new JSONArray();
         for (T data : dataList) {
