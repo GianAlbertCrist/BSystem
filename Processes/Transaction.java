@@ -19,7 +19,7 @@ public class Transaction {
         ReceiveTransfer,
         ExternalTransfer,
         Payment,
-        Recompense, Credit
+        Recompense, Credit, ReceivePayment
     }
 
     /**

@@ -63,7 +63,7 @@ public class CreditAccount extends Account implements Payment, Recompense {
      *
      * @param amountAdjustment Amount to be adjusted to the loan of this credit account.
      */
-    private void adjustLoanAmount(double amountAdjustment) {
+    public void adjustLoanAmount(double amountAdjustment) {
         this.loanBalance += amountAdjustment;
         if (this.loanBalance < 0) {
             this.loanBalance = 0.0;

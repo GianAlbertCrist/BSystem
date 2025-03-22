@@ -37,7 +37,7 @@ public class SavingsAccount extends Account implements Withdrawal, Deposit, Fund
      * Adjust the account balance of this savings account.
      * @param amount - Amount to be added or subtracted from the balance.
      */
-    private void adjustAccountBalance(double amount) {
+    public void adjustAccountBalance(double amount) {
         this.balance += amount;
         if (this.balance < 0) {
             this.balance = 0.0;

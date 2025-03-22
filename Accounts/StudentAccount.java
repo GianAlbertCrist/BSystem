@@ -2,8 +2,10 @@ package Accounts;
 
 import Bank.Bank;
 import Processes.Deposit;
+import Processes.IllegalAccountType;
 import Processes.Withdrawal;
 import Processes.TransactionManager;
+import Processes.Transaction;
 
 public final class StudentAccount extends Account implements Deposit, Withdrawal {
 
@@ -75,7 +77,7 @@ public final class StudentAccount extends Account implements Deposit, Withdrawal
      *
      * @param amount - Amount to be added or subtracted from the balance.
      */
-    private void adjustAccountBalance(double amount) {
+    public void adjustAccountBalance(double amount) {
         this.savingsBalance += amount;
         if (this.savingsBalance < 0) {
             this.savingsBalance = 0.0;
@@ -97,11 +99,7 @@ public final class StudentAccount extends Account implements Deposit, Withdrawal
      */
     @Override
     public boolean cashDeposit(double amount) {
-        if (TransactionManager.deposit(this, amount)) {
-            adjustAccountBalance(amount);
-            return true;
-        }
-        return false;
+        return TransactionManager.deposit(this, amount);
     }
 
     /**
@@ -112,11 +110,7 @@ public final class StudentAccount extends Account implements Deposit, Withdrawal
      */
     @Override
     public boolean withdrawal(double amount) {
-        if (TransactionManager.withdraw(this, amount)) {
-            adjustAccountBalance(-amount);
-            return true;
-        }
-        return false;
+        return TransactionManager.withdraw(this, amount);
     }
 
     /**
@@ -129,41 +123,14 @@ public final class StudentAccount extends Account implements Deposit, Withdrawal
                 this.getAccountNumber(), getOwnerFullName(), this.savingsBalance);
     }
 
-    /**
-     * Transfers an amount of money from this account to another student account.
-     * Cannot proceed if one of the following is true:
-     * <ul>
-     *     <li>Insufficient balance from source account.</li>
-     *     <li>Recipient account does not exist.</li>
-     *     <li>Recipient account is from another bank.</li>
-     * </ul>
-     * @param account – Account number of recipient
-     * @param amount – Amount of money to be supposedly adjusted from this account’s balance.
-     * @return Flag if fund transfer transaction is successful or not.
-     */
-    public boolean transfer(StudentAccount account, double amount) {
-        if (!isEligibleForStudentAccount()) {
-            throw new IllegalArgumentException("Account holder must be between 18 and 25 years old.");
-        }
-
-        if (amount <= 0 || amount > this.savingsBalance || amount > getBank().getWithdrawLimit()) {
-            insufficientBalance();
-            return false;
-        }
-
-        // Deduct from sender and add to recipient
-        adjustAccountBalance(-amount);
-        account.adjustAccountBalance(amount);
-
-        // Log transactions for both accounts
-        addNewTransaction(account.getAccountNumber(), Transaction.Transactions.FundTransfer,
-                String.format("Transferred Php %.2f to %s", amount, account.getAccountNumber()));
-        account.addNewTransaction(getAccountNumber(), Transaction.Transactions.ReceiveTransfer,
-                String.format("Received Php %.2f from %s", amount, getAccountNumber()));
-
-        return true;
+    public boolean transfer(StudentAccount account, double amount) throws IllegalAccountType {
+        return TransactionManager.internalTransfer(this, account, amount);
     }
 
+    public boolean transfer(Bank bank, StudentAccount account, double amount) throws IllegalAccountType{
+        return TransactionManager.externalTransfer(bank, this, bank, account, amount);
+    }
+    
     public double getAccountBalance() {
         return this.savingsBalance;
     }

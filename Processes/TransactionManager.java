@@ -8,22 +8,22 @@ import Accounts.StudentAccount;
 import Bank.Bank;
 
 public class TransactionManager {
-
+    
     public static boolean deposit(Account account, double amount) {
         if (amount > account.getBank().getDepositLimit()) {
             System.out.println("Deposit amount exceeds the bank's limit.");
             return false;
         }
-        if (account instanceof BusinessAccount) {
-            return ((BusinessAccount) account).cashDeposit(amount);
-        } else if (account instanceof SavingsAccount) {
-            return ((SavingsAccount) account).cashDeposit(amount);
+        if (account instanceof SavingsAccount) {
+            ((SavingsAccount) account).adjustAccountBalance(amount);
         } else if (account instanceof StudentAccount) {
-            return ((StudentAccount) account).cashDeposit(amount);
-        } else {
-            System.out.println("Deposit failed: Unsupported account type.");
-            return false;
+            ((StudentAccount) account).adjustAccountBalance(amount);
+        } else if (account instanceof BusinessAccount) {
+            ((BusinessAccount) account).adjustAccountBalance(amount);
         }
+        account.addNewTransaction(account.getAccountNumber(), Transaction.Transactions.Deposit,
+                "Deposited Php " + amount);
+        return true;
     }
 
     public static boolean withdraw(Account account, double amount) {
@@ -31,46 +31,62 @@ public class TransactionManager {
             System.out.println("Warning: Insufficient balance to complete the transaction.");
             return false;
         }
-        if (account instanceof BusinessAccount) {
-            return ((BusinessAccount) account).withdrawal(amount);
-        } else if (account instanceof SavingsAccount) {
-            return ((SavingsAccount) account).withdrawal(amount);
+        if (account instanceof SavingsAccount) {
+            ((SavingsAccount) account).adjustAccountBalance(-amount);
         } else if (account instanceof StudentAccount) {
-            return ((StudentAccount) account).withdrawal(amount);
-        } else {
-            System.out.println("Withdrawal failed: Unsupported account type.");
-            return false;
+            ((StudentAccount) account).adjustAccountBalance(-amount);
+        } else if (account instanceof BusinessAccount) {
+            ((BusinessAccount) account).adjustAccountBalance(-amount);
         }
+        account.addNewTransaction(account.getAccountNumber(), Transaction.Transactions.Withdraw,
+                String.format("Withdraw Php %.2f", amount));
+        return true;
     }
 
     public static boolean internalTransfer(Account sender, Account recipient, double amount) throws IllegalAccountType {
-        if (sender instanceof BusinessAccount) {
-            return ((BusinessAccount) sender).transfer(recipient, amount);
-        } else if (sender instanceof SavingsAccount) {
+        if (sender.getBank().getWithdrawLimit() < amount) {
+            System.out.println("Transfer failed: Amount exceeds withdrawal limit.");
+            return false;
+        }
+        if (sender instanceof SavingsAccount) {
             return ((SavingsAccount) sender).transfer(recipient, amount);
-        } else {
-            System.out.println("Internal transfer failed: Unsupported account type.");
-            return false;
+        } else if (sender instanceof BusinessAccount) {
+            return ((BusinessAccount) sender).transfer(recipient, amount);
         }
+        System.out.println("Internal transfer failed: Unsupported account type.");
+        return false;
     }
-
+    
     public static boolean externalTransfer(Bank senderBank, Account sender, Bank recipientBank, Account recipient, double amount) throws IllegalAccountType {
-        if (sender instanceof BusinessAccount) {
-            return ((BusinessAccount) sender).transfer(recipientBank, recipient, amount);
-        } else if (sender instanceof SavingsAccount) {
-            return ((SavingsAccount) sender).transfer(recipientBank, recipient, amount);
-        } else {
-            System.out.println("External transfer failed: Unsupported account type.");
+        double totalAmount = amount + senderBank.getProcessingFee();
+        if (sender.getBank().getWithdrawLimit() < totalAmount) {
+            System.out.println("External transfer failed: Amount exceeds withdrawal limit.");
             return false;
         }
+        if (sender instanceof SavingsAccount) {
+            return ((SavingsAccount) sender).transfer(recipientBank, recipient, amount);
+        } else if (sender instanceof BusinessAccount) {
+            return ((BusinessAccount) sender).transfer(recipientBank, recipient, amount);
+        }
+        System.out.println("External transfer failed: Unsupported account type.");
+        return false;
     }
+    
 
     public static boolean credit(Account account, double amount) {
-        if (amount <= 0) {
-            System.out.println("Credit failed: Invalid amount.");
+        if (!(account instanceof CreditAccount)) {
+            System.out.println("Credit failed: Only CreditAccounts can be credited.");
             return false;
         }
-        return deposit(account, amount); // Credit is essentially a deposit
+        if (amount <= 0 || amount > account.getBank().getCreditLimit()) {
+            System.out.println("Credit failed: Invalid or exceeded credit limit.");
+            return false;
+        }
+        CreditAccount creditAccount = (CreditAccount) account;
+        creditAccount.adjustLoanAmount(amount);
+        creditAccount.addNewTransaction(creditAccount.getAccountNumber(), Transaction.Transactions.Credit,
+                "Credited Php " + amount);
+        return true;
     }
 
     public static boolean recompense(Account account, double amount) {
@@ -78,7 +94,15 @@ public class TransactionManager {
             System.out.println("Recompense failed: Only CreditAccounts can recompense.");
             return false;
         }
-        return ((CreditAccount) account).recompense(amount);
+        CreditAccount creditAccount = (CreditAccount) account;
+        if (creditAccount.getLoan() < amount) {
+            System.out.println("Recompense failed: Amount exceeds current loan balance.");
+            return false;
+        }
+        creditAccount.adjustLoanAmount(-amount);
+        creditAccount.addNewTransaction(creditAccount.getAccountNumber(), Transaction.Transactions.Recompense,
+                "Recompensed Php " + amount);
+        return true;
     }
 
     public static boolean pay(Account sender, Account recipient, double amount) {
@@ -86,10 +110,18 @@ public class TransactionManager {
             System.out.println("Payment failed: CreditAccounts can only pay to SavingsAccounts.");
             return false;
         }
-        return ((CreditAccount) sender).pay(recipient, amount);
-    }
-
-    public static boolean transfer(BusinessAccount sender, Bank bank, Account account, double amount) throws IllegalAccountType {
-        return sender.transfer(bank, account, amount);
+        CreditAccount creditSender = (CreditAccount) sender;
+        SavingsAccount savingsRecipient = (SavingsAccount) recipient;
+        if (creditSender.getLoan() < amount) {
+            System.out.println("Payment failed: Insufficient credit balance.");
+            return false;
+        }
+        creditSender.adjustLoanAmount(-amount);
+        savingsRecipient.adjustAccountBalance(amount);
+        creditSender.addNewTransaction(savingsRecipient.getAccountNumber(), Transaction.Transactions.Payment,
+                "Paid Php " + amount + " to " + savingsRecipient.getAccountNumber());
+        savingsRecipient.addNewTransaction(creditSender.getAccountNumber(), Transaction.Transactions.ReceivePayment,
+                "Received Php " + amount + " from " + creditSender.getAccountNumber());
+        return true;
     }
 }

@@ -89,6 +89,7 @@ public class BusinessAccount extends Account implements Deposit, Withdrawal, Fun
             insufficientBalance();
             return false; // Insufficient funds or exceeding withdrawal limit
         }
+
         // Deduct full amount from sender including processing fee
         adjustAccountBalance(-totalAmount);
 
