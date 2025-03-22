@@ -57,54 +57,22 @@ public class BusinessAccount extends Account implements Deposit, Withdrawal, Fun
 
     @Override
     public boolean cashDeposit(double amount) {
-        if (TransactionManager.deposit(this, amount)) {
-            adjustAccountBalance(amount);
-            return true;
-        }
-        return false;
+        return TransactionManager.deposit(this, amount);
     }
 
     @Override
     public boolean withdrawal(double amount) {
-        if (TransactionManager.withdraw(this, amount)) {
-            adjustAccountBalance(-amount);
-            return true;
-        }
-        return false;
+        return TransactionManager.withdraw(this, amount);
     }
 
     @Override
     public boolean transfer(Bank bank, Account account, double amount) throws IllegalAccountType {
-        if (!(account instanceof BusinessAccount)) {
-            throw new IllegalAccountType("Can only transfer funds to a Business account.");
-        }
-        return false;
+        return TransactionManager.externalTransfer(this.getBank(), this, bank, account, amount);
     }
 
     @Override
     public boolean transfer(Account account, double amount) throws IllegalAccountType {
-        double totalAmount = amount + this.getBank().getProcessingFee();
-
-        if (!hasEnoughBalance(totalAmount) || amount <= 0 || totalAmount > this.getBank().getWithdrawLimit()) {
-            insufficientBalance();
-            return false; // Insufficient funds or exceeding withdrawal limit
-        }
-
-        // Deduct full amount from sender including processing fee
-        adjustAccountBalance(-totalAmount);
-
-        // Credit only the transferred amount (not including fee) to recipient
-        ((SavingsAccount) account).adjustAccountBalance(amount);
-
-        // Log transactions for both accounts
-        addNewTransaction(account.getAccountNumber(), Transaction.Transactions.ExternalTransfer,
-                String.format("Transferred Php %.2f to %s at %s (Fee: Php %.2f)",
-                        amount, account.getAccountNumber(), getBank().getName(), this.getBank().getProcessingFee()));
-
-        account.addNewTransaction(getAccountNumber(), Transaction.Transactions.ReceiveTransfer,
-                String.format("Received Php %.2f from %s at %s", amount, this.getAccountNumber(), this.getBank().getName()));
-
-        return true;
+        return TransactionManager.internalTransfer(this, account, amount);
     }
 
     @Override

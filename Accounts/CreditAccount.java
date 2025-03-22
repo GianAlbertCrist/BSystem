@@ -78,10 +78,10 @@ public class CreditAccount extends Account implements Payment, Recompense {
      */
     @Override
     public boolean pay(Account account, double amount) {
-        if (TransactionManager.pay(this, account, amount)) {
-            adjustLoanAmount(-amount);
+        if (canCredit(amount) && TransactionManager.pay(this, account, amount)) {
             return true;
         }
+        System.out.println("Payment failed: Exceeds credit limit.");
         return false;
     }
 
@@ -94,11 +94,7 @@ public class CreditAccount extends Account implements Payment, Recompense {
      */
     @Override
     public boolean recompense(double amount) {
-        if (TransactionManager.recompense(this, amount)) {
-            adjustLoanAmount(-amount);
-            return true;
-        }
-        return false;
+       return TransactionManager.recompense(this, amount);
     }
 
     @Override

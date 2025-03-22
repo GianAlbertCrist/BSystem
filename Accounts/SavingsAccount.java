@@ -51,11 +51,7 @@ public class SavingsAccount extends Account implements Withdrawal, Deposit, Fund
      */
     @Override
     public boolean cashDeposit(double amount) {
-        if (TransactionManager.deposit(this, amount)) {
-            adjustAccountBalance(amount);
-            return true;
-        }
-        return false;
+        return TransactionManager.deposit(this, amount);
     }
 
     /**
@@ -65,11 +61,7 @@ public class SavingsAccount extends Account implements Withdrawal, Deposit, Fund
      */
     @Override
     public boolean withdrawal(double amount) {
-        if (TransactionManager.withdraw(this, amount)) {
-            adjustAccountBalance(-amount);
-            return true;
-        }
-        return false;
+        return TransactionManager.withdraw(this, amount);
     }
 
     /**
@@ -80,11 +72,7 @@ public class SavingsAccount extends Account implements Withdrawal, Deposit, Fund
      */
     @Override
     public boolean transfer(Account account, double amount) throws IllegalAccountType {
-        if (TransactionManager.internalTransfer(this, account, amount)) {
-            adjustAccountBalance(-amount);
-            return true;
-        }
-        return false;
+        return TransactionManager.internalTransfer(this, account, amount);
     }
 
     /**
@@ -96,11 +84,7 @@ public class SavingsAccount extends Account implements Withdrawal, Deposit, Fund
      */
     @Override
     public boolean transfer(Bank bank, Account account, double amount) throws IllegalAccountType {
-        if (TransactionManager.externalTransfer(this.getBank(), this, bank, account, amount)) {
-            adjustAccountBalance(-amount);
-            return true;
-        }
-        return false;
+        return TransactionManager.externalTransfer(this.getBank(), this, bank, account, amount);
     }
 
     @Override

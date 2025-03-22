@@ -16,10 +16,10 @@ public class TransactionManager {
         }
         if (account instanceof SavingsAccount) {
             ((SavingsAccount) account).adjustAccountBalance(amount);
-        } else if (account instanceof StudentAccount) {
-            ((StudentAccount) account).adjustAccountBalance(amount);
-        } else if (account instanceof BusinessAccount) {
-            ((BusinessAccount) account).adjustAccountBalance(amount);
+        } else if (account instanceof StudentAccount studentAccount) {
+            studentAccount.adjustAccountBalance(amount);
+        } else if (account instanceof BusinessAccount businessAccount) {
+            businessAccount.adjustAccountBalance(amount);
         }
         account.addNewTransaction(account.getAccountNumber(), Transaction.Transactions.Deposit,
                 "Deposited Php " + amount);
@@ -28,15 +28,15 @@ public class TransactionManager {
 
     public static boolean withdraw(Account account, double amount) {
         if (amount <= 0 || amount > account.getBank().getWithdrawLimit()) {
-            System.out.println("Warning: Insufficient balance to complete the transaction.");
+            System.out.println("Warning: Insufficient balance or exceeds withdrawal limit.");
             return false;
         }
-        if (account instanceof SavingsAccount) {
-            ((SavingsAccount) account).adjustAccountBalance(-amount);
-        } else if (account instanceof StudentAccount) {
-            ((StudentAccount) account).adjustAccountBalance(-amount);
-        } else if (account instanceof BusinessAccount) {
-            ((BusinessAccount) account).adjustAccountBalance(-amount);
+        if (account instanceof SavingsAccount savingsAccount) {
+            savingsAccount.adjustAccountBalance(-amount);
+        } else if (account instanceof StudentAccount studentAccount) {
+            studentAccount.adjustAccountBalance(-amount);
+        } else if (account instanceof BusinessAccount businessAccount) {
+            businessAccount.adjustAccountBalance(-amount);
         }
         account.addNewTransaction(account.getAccountNumber(), Transaction.Transactions.Withdraw,
                 String.format("Withdraw Php %.2f", amount));
@@ -44,14 +44,14 @@ public class TransactionManager {
     }
 
     public static boolean internalTransfer(Account sender, Account recipient, double amount) throws IllegalAccountType {
-        if (sender.getBank().getWithdrawLimit() < amount) {
-            System.out.println("Transfer failed: Amount exceeds withdrawal limit.");
+        if (amount <= 0 || amount > sender.getBank().getWithdrawLimit()) {
+            System.out.println("Transfer failed: Insufficient balance or exceeds withdrawal limit.");
             return false;
         }
-        if (sender instanceof SavingsAccount) {
-            return ((SavingsAccount) sender).transfer(recipient, amount);
-        } else if (sender instanceof BusinessAccount) {
-            return ((BusinessAccount) sender).transfer(recipient, amount);
+        if (sender instanceof SavingsAccount savingsAccount) {
+            return savingsAccount.transfer(recipient, amount);
+        } else if (sender instanceof BusinessAccount businessAccount) {
+            return businessAccount.transfer(recipient, amount);
         }
         System.out.println("Internal transfer failed: Unsupported account type.");
         return false;
@@ -59,14 +59,14 @@ public class TransactionManager {
     
     public static boolean externalTransfer(Bank senderBank, Account sender, Bank recipientBank, Account recipient, double amount) throws IllegalAccountType {
         double totalAmount = amount + senderBank.getProcessingFee();
-        if (sender.getBank().getWithdrawLimit() < totalAmount) {
-            System.out.println("External transfer failed: Amount exceeds withdrawal limit.");
+        if (amount <= 0 || totalAmount > sender.getBank().getWithdrawLimit()) {
+            System.out.println("External transfer failed: Insufficient balance or exceeds withdrawal limit.");
             return false;
         }
-        if (sender instanceof SavingsAccount) {
-            return ((SavingsAccount) sender).transfer(recipientBank, recipient, amount);
-        } else if (sender instanceof BusinessAccount) {
-            return ((BusinessAccount) sender).transfer(recipientBank, recipient, amount);
+        if (sender instanceof SavingsAccount savingsAccount) {
+            return savingsAccount.transfer(recipientBank, recipient, amount);
+        } else if (sender instanceof BusinessAccount businessAccount) {
+            return businessAccount.transfer(recipientBank, recipient, amount);
         }
         System.out.println("External transfer failed: Unsupported account type.");
         return false;
@@ -95,13 +95,14 @@ public class TransactionManager {
             return false;
         }
         CreditAccount creditAccount = (CreditAccount) account;
-        if (creditAccount.getLoan() < amount) {
-            System.out.println("Recompense failed: Amount exceeds current loan balance.");
+        if (amount <= 0 || amount > creditAccount.getLoan()) {
+            System.out.println("Recompense failed: Invalid amount or amount exceeds current loan balance.");
             return false;
         }
         creditAccount.adjustLoanAmount(-amount);
         creditAccount.addNewTransaction(creditAccount.getAccountNumber(), Transaction.Transactions.Recompense,
                 "Recompensed Php " + amount);
+        System.out.println("Recompense successful.");
         return true;
     }
 
@@ -112,16 +113,18 @@ public class TransactionManager {
         }
         CreditAccount creditSender = (CreditAccount) sender;
         SavingsAccount savingsRecipient = (SavingsAccount) recipient;
-        if (creditSender.getLoan() < amount) {
-            System.out.println("Payment failed: Insufficient credit balance.");
-            return false;
-        }
-        creditSender.adjustLoanAmount(-amount);
+    
+        // Increase the loan balance by the payment amount
+        creditSender.adjustLoanAmount(amount);
         savingsRecipient.adjustAccountBalance(amount);
+    
+        // Add transactions for both accounts
         creditSender.addNewTransaction(savingsRecipient.getAccountNumber(), Transaction.Transactions.Payment,
                 "Paid Php " + amount + " to " + savingsRecipient.getAccountNumber());
         savingsRecipient.addNewTransaction(creditSender.getAccountNumber(), Transaction.Transactions.ReceivePayment,
                 "Received Php " + amount + " from " + creditSender.getAccountNumber());
+    
+        System.out.println("Payment successful. New loan balance: Php " + creditSender.getLoan());
         return true;
     }
 }
